@@ -1,14 +1,16 @@
 /* ---------------------------------------------------
-   FIREBASE IMPORTS
+   FIREBASE INITIALISATION
 --------------------------------------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, onSnapshot
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* ---------------------------------------------------
-   FIREBASE CONFIG (your project)
---------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBHUGgt8F4OQJjdx11qOMPC0iRJGFZmU8E",
   authDomain: "westminsterpints.firebaseapp.com",
@@ -22,23 +24,32 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* ---------------------------------------------------
-   STATE
+   STATE STORAGE
 --------------------------------------------------- */
 let pubs = [];
+let pints = [];
 let prices = [];
-let admin = false;
-let leagueFilterType = "all";
-let previousCheapest = null;
 
-/* Budget */
+/* User budget */
 let userBudget = localStorage.getItem("budget") || null;
 let userMaxPrice = localStorage.getItem("maxPrice") || null;
 
+/* PINX old value */
+let previousPINX = null;
+
+/* Show all toggle */
+let showAll = false;
+
 /* ---------------------------------------------------
-   FIRESTORE SUBSCRIPTIONS
+   SUBSCRIPTIONS
 --------------------------------------------------- */
 onSnapshot(collection(db, "pubs"), snap => {
   pubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  refreshUI();
+});
+
+onSnapshot(collection(db, "pints"), snap => {
+  pints = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   refreshUI();
 });
 
@@ -48,258 +59,228 @@ onSnapshot(collection(db, "prices"), snap => {
 });
 
 /* ---------------------------------------------------
-   ADD PUB
---------------------------------------------------- */
-document.getElementById("addPubBtn").onclick = async () => {
-  const name = document.getElementById("pubNameInput").value;
-  if (!name) return;
-  await addDoc(collection(db, "pubs"), { name });
-  document.getElementById("pubNameInput").value = "";
-};
-
-/* ---------------------------------------------------
-   ADD PINT
---------------------------------------------------- */
-document.getElementById("addPintBtn").onclick = async () => {
-  const pubId = document.getElementById("pintPubSelect").value;
-  const pintName = document.getElementById("pintNameInput").value;
-  const type = document.getElementById("pintTypeSelect").value;
-  const price = parseFloat(document.getElementById("pintPriceInput").value);
-
-  if (!pubId || !pintName || !price) return alert("Missing fields");
-
-  await addDoc(collection(db, "prices"), {
-    pubId,
-    pintName,
-    type,
-    price,
-    timestamp: Date.now()
-  });
-
-  document.getElementById("pintNameInput").value = "";
-  document.getElementById("pintPriceInput").value = "";
-};
-
-/* ---------------------------------------------------
-   LEAGUE FILTER
---------------------------------------------------- */
-document.getElementById("leagueFilter").onchange = e => {
-  leagueFilterType = e.target.value;
-  refreshUI();
-};
-
-/* ---------------------------------------------------
-   BUDGET HELPER
---------------------------------------------------- */
-document.getElementById("saveBudgetBtn").onclick = () => {
-  const b = document.getElementById("budgetInput").value;
-  const m = document.getElementById("maxPriceInput").value;
-  if (!b || !m) return;
-  userBudget = b;
-  userMaxPrice = m;
-  localStorage.setItem("budget", b);
-  localStorage.setItem("maxPrice", m);
-  renderBudgetHelper();
-};
-
-/* ---------------------------------------------------
-   ADMIN PANEL
---------------------------------------------------- */
-document.getElementById("adminToggle").onclick = () => {
-  admin = !admin;
-  document.getElementById("adminToggle").innerText =
-    admin ? "⚙️ Admin: ON" : "⚙️ Admin: OFF";
-  document.getElementById("adminPanel").style.display =
-    admin ? "block" : "none";
-  refreshUI();
-};
-
-/* ---------------------------------------------------
-   REFRESH UI (main loop)
+   UI REFRESHER (MAIN LOOP)
 --------------------------------------------------- */
 function refreshUI() {
   populatePubSelect();
+  populatePintSelect();
   computePubStats();
   renderPINX();
-  renderCheapestTop();
-  renderPollingIntent();
-  renderMiniStats();
+  renderCheapest();
+  renderLeague();
   renderBudgetHelper();
-  renderPubTiles();
-  renderRecentFeed();
+  renderRecent();
   renderGoodInvestments();
-  renderAdmin();
 }
 
 /* ---------------------------------------------------
-   POPULATE PUB SELECT (dropdown fix)
+   POPULATE SELECT MENUS
 --------------------------------------------------- */
 function populatePubSelect() {
   const sel = document.getElementById("pintPubSelect");
   if (!pubs.length) {
-    sel.innerHTML = `<option>No pubs yet</option>`;
+    sel.innerHTML = "<option>No pubs yet</option>";
     return;
   }
-  sel.innerHTML = pubs
-    .map(p => `<option value="${p.id}">${p.name}</option>`)
-    .join("");
+  sel.innerHTML = pubs.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+}
+
+function populatePintSelect() {
+  const sel = document.getElementById("pintSelect");
+  if (!pints.length) {
+    sel.innerHTML = "<option>No pints yet</option>";
+    return;
+  }
+  sel.innerHTML = pints.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
 }
 
 /* ---------------------------------------------------
-   STATS
+   COMPUTE PUB STATS
 --------------------------------------------------- */
 function computePubStats() {
   pubs.forEach(pub => {
     const entries = prices.filter(p => p.pubId === pub.id);
 
     if (!entries.length) {
-      pub.avgPrice = 0;
-      pub.trendPercent24 = 0;
-      pub.activity = 0;
+      pub.avg = null;
+      pub.trend = 0;
       return;
     }
 
-    pub.avgPrice =
-      entries.reduce((a,b)=>a+b.price,0) / entries.length;
+    const sorted = [...entries].sort((a,b)=>a.timestamp - b.timestamp);
+    pub.avg = sorted.reduce((a,b)=>a+b.price,0) / sorted.length;
 
-    const now = Date.now();
-    const day = entries.filter(e => now - e.timestamp < 86400000);
-
-    if (day.length > 1) {
-      const first = day[0].price;
-      const last = day[day.length-1].price;
-      pub.trendPercent24 = ((last - first) / first) * 100;
-    } else pub.trendPercent24 = 0;
-
-    pub.activity = day.length;
+    if (sorted.length >= 2) {
+      const first = sorted[0].price;
+      const last = sorted[sorted.length - 1].price;
+      pub.trend = ((last - first) / first) * 100;
+    } else {
+      pub.trend = 0;
+    }
   });
 }
 
 /* ---------------------------------------------------
-   PINX
+   ADD PINT PRICE
+--------------------------------------------------- */
+document.getElementById("addPintBtn").onclick = async () => {
+  const pubId = document.getElementById("pintPubSelect").value;
+  const pintId = document.getElementById("pintSelect").value;
+  const price = parseFloat(document.getElementById("pintPriceInput").value);
+
+  if (!pubId || !pintId || !price) {
+    alert("Please fill all fields.");
+    return;
+  }
+
+  const pintObj = pints.find(p => p.id === pintId);
+
+  await addDoc(collection(db, "prices"), {
+    pubId,
+    pintName: pintObj.name,
+    type: pintObj.type,
+    price,
+    timestamp: Date.now()
+  });
+
+  document.getElementById("pintPriceInput").value = "";
+
+  showToast("Pint price added!");
+};
+
+/* ---------------------------------------------------
+   ADD PUB
+--------------------------------------------------- */
+document.getElementById("addPubBtn").onclick = async () => {
+  const name = document.getElementById("pubNameInput").value.trim();
+  if (!name) return;
+
+  await addDoc(collection(db, "pubs"), { name });
+  document.getElementById("pubNameInput").value = "";
+  showToast("Pub added!");
+};
+
+/* ---------------------------------------------------
+   PINX INDEX
 --------------------------------------------------- */
 function renderPINX() {
   if (!pubs.length) return;
-  const avg = pubs.reduce((a,b)=>a+b.avgPrice,0) / pubs.length;
-  document.getElementById("pinxValue").innerText = isNaN(avg) ? "0" : Math.round(avg * 100);
-}
 
-/* ---------------------------------------------------
-   CHEAPEST PINT + TOAST
---------------------------------------------------- */
-function renderCheapestTop() {
-  const valid = pubs.filter(p => p.avgPrice > 0);
+  const valid = pubs.filter(p => p.avg);
   if (!valid.length) return;
 
-  const c = valid.sort((a,b)=>a.avgPrice - b.avgPrice)[0];
+  const avg = valid.reduce((a,b)=>a+b.avg,0) / valid.length;
+  const pinx = Math.round(avg * 100);
 
-  document.getElementById("cheapestTop").innerHTML =
-    `£${c.avgPrice.toFixed(2)} at ${c.name}`;
+  const el = document.getElementById("pinxValue");
 
-  if (previousCheapest && previousCheapest !== c.name) {
-    showToast(`🎉 New Cheapest Pint! ${c.name} at £${c.avgPrice.toFixed(2)}`);
+  let direction = "";
+  if (previousPINX !== null) {
+    if (pinx > previousPINX) direction = " 🔺";
+    else if (pinx < previousPINX) direction = " 🔻";
+    else direction = " ⏸️";
   }
 
-  previousCheapest = c.name;
-}
+  el.innerText = pinx + direction;
 
-function showToast(msg) {
-  const t = document.getElementById("flashToast");
-  t.innerText = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3500);
+  previousPINX = pinx;
 }
 
 /* ---------------------------------------------------
-   POLLING INTENT
+   CHEAPEST PINT
 --------------------------------------------------- */
-function renderPollingIntent() {
-  const bars = document.getElementById("pollingBars");
-  const lead = document.getElementById("pollingLeader");
+function renderCheapest() {
+  const valid = pubs.filter(p => p.avg !== null);
+  if (!valid.length) return;
 
-  const recent = [...prices]
-    .sort((a,b)=>b.timestamp - a.timestamp)
-    .slice(0,30);
+  const cheapest = [...valid].sort((a,b)=>a.avg - b.avg)[0];
 
-  const types = ["Lager","Ale","IPA","Guinness","Cider"];
-  const counts = Object.fromEntries(types.map(t=>[t,0]));
+  document.getElementById("cheapestTop").innerText =
+    `£${cheapest.avg.toFixed(2)} at ${cheapest.name}`;
+}
 
-  recent.forEach(r => counts[r.type]++);
+/* ---------------------------------------------------
+   LEAGUE TABLE
+--------------------------------------------------- */
+function renderLeague() {
+  const typeFilter = document.getElementById("leagueFilter").value;
 
-  const total = recent.length || 1;
+  const filteredPrices = typeFilter === "all"
+    ? pubs
+    : pubs.filter(pub =>
+        prices.some(p => p.pubId === pub.id && p.type === typeFilter)
+      );
 
-  bars.innerHTML = types.map(t => {
-    const pct = (counts[t] / total) * 100;
-    return `
-      <div class="poll-bar">
-        <div class="poll-fill" style="width:${pct}%;"></div>
-        <span class="poll-type-label">${t}</span>
-        <span class="poll-percent">${pct.toFixed(0)}%</span>
+  const valid = filteredPrices.filter(p => p.avg !== null);
+
+  const cheapest5 = [...valid].sort((a,b)=>a.avg - b.avg).slice(0,5);
+  const expensive5 = [...valid].sort((a,b)=>b.avg - a.avg).slice(0,5);
+
+  document.getElementById("topCheapest").innerHTML =
+    cheapest5.map(pub => pubTile(pub)).join("");
+
+  document.getElementById("topExpensive").innerHTML =
+    expensive5.map(pub => pubTile(pub)).join("");
+
+  /* Show All */
+  if (showAll) {
+    const allSorted = [...valid].sort((a,b)=>a.avg - b.avg);
+    document.getElementById("allPubs").style.display = "grid";
+    document.getElementById("allPubs").innerHTML =
+      allSorted.map(pub => pubTile(pub)).join("");
+
+    drawAllSparks(allSorted);
+  } else {
+    document.getElementById("allPubs").style.display = "none";
+  }
+
+  drawAllSparks(cheapest5);
+  drawAllSparks(expensive5);
+}
+
+/* Expand/Collapse */
+document.getElementById("showAllBtn").onclick = () => {
+  showAll = !showAll;
+  document.getElementById("showAllBtn").innerText =
+    showAll ? "Hide ▲" : "Show All ▼";
+  renderLeague();
+};
+
+/* ---------------------------------------------------
+   PUB TILE HTML
+--------------------------------------------------- */
+function pubTile(pub) {
+  return `
+    <div class="pub-tile" style="border-left-color:${trendColor(pub.trend)}">
+      <div class="pub-header">
+        <span>${pub.name}</span>
+        <span>£${pub.avg.toFixed(2)}</span>
       </div>
-    `;
-  }).join("");
-
-  const leading = types.sort((a,b)=>counts[b]-counts[a])[0];
-  lead.innerText = `${leading} leads the pint polls today.`;
-}
-
-/* ---------------------------------------------------
-   MINI STATS
---------------------------------------------------- */
-function renderMiniStats() {
-  const div = document.getElementById("miniStatsContent");
-
-  const valid = pubs.filter(p=>p.avgPrice>0);
-  if (!valid.length) {
-    div.innerHTML = "Not enough data.";
-    return;
-  }
-
-  const avg = valid.reduce((a,b)=>a+b.avgPrice,0) / valid.length;
-  const cheapest = [...valid].sort((a,b)=>a.avgPrice - b.avgPrice)[0];
-  const active = [...valid].sort((a,b)=>b.activity - a.activity)[0];
-
-  div.innerHTML = `
-    <div class="mini-stat"><strong>Avg Price:</strong> £${avg.toFixed(2)}</div>
-    <div class="mini-stat"><strong>Cheapest Pub:</strong> ${cheapest.name}</div>
-    <div class="mini-stat"><strong>Most Active:</strong> ${active.name}</div>
+      <div class="pub-badges">${makeBadges(pub)}</div>
+      <canvas class="spark" id="spark-${pub.id}"></canvas>
+    </div>
   `;
 }
 
-/* ---------------------------------------------------
-   BUDGET HELPER
---------------------------------------------------- */
-function renderBudgetHelper() {
-  const div = document.getElementById("budgetResults");
+function makeBadges(pub) {
+  const b = [];
+  if (pub.avg < 5) b.push("⭐ Cheap");
+  if (pub.trend < -2) b.push("📉 Falling");
+  if (pub.trend > 2) b.push("📈 Rising");
+  return b.join(" • ") || "—";
+}
 
-  if (!userBudget || !userMaxPrice) {
-    div.innerHTML = "Set your budget above.";
-    return;
-  }
-
-  const affordable = pubs.filter(p =>
-    p.avgPrice > 0 &&
-    p.avgPrice <= userMaxPrice
-  );
-
-  if (!affordable.length) {
-    div.innerHTML = "No affordable pints under your max price.";
-    return;
-  }
-
-  div.innerHTML = `
-    <strong>Affordable Pubs:</strong><br>
-    ${affordable.map(p=>`${p.name} (£${p.avgPrice.toFixed(2)})`).join("<br>")}
-  `;
+function trendColor(t) {
+  if (t < 0) return "var(--green)";
+  if (t > 0) return "var(--red)";
+  return "#888";
 }
 
 /* ---------------------------------------------------
-   PUB TILES
+   SPARKLINE DRAWER
 --------------------------------------------------- */
-function trendColor(v) {
-  if (v < 0) return "var(--green)";
-  if (v > 0) return "var(--red)";
-  return "#ccc";
+function drawAllSparks(list) {
+  list.forEach(pub => drawSpark(pub.id));
 }
 
 function drawSpark(pubId) {
@@ -307,6 +288,9 @@ function drawSpark(pubId) {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+
   const pts = prices
     .filter(p => p.pubId === pubId)
     .sort((a,b)=>a.timestamp - b.timestamp)
@@ -318,80 +302,84 @@ function drawSpark(pubId) {
   const max = Math.max(...values);
   const min = Math.min(...values);
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
   ctx.beginPath();
-  ctx.strokeStyle = values.at(-1) >= values[0] ? "var(--green)" : "var(--red)";
+  ctx.strokeStyle = values.at(-1) >= values[0]
+    ? "var(--green)"
+    : "var(--red)";
+  ctx.lineWidth = 2;
 
-  values.forEach((v,i)=>{
-    const x = (i/(values.length-1)) * canvas.width;
-    const y = canvas.height - ((v-min)/(max-min)) * canvas.height;
-    if (i===0) ctx.moveTo(x,y);
+  values.forEach((v,i) => {
+    const x = (i / (values.length - 1)) * canvas.width;
+    const y = canvas.height - ((v - min) / (max - min)) * canvas.height;
+
+    if (i === 0) ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   });
 
   ctx.stroke();
 }
 
-function renderPubTiles() {
-  const mode = document.getElementById("leagueMode").value;
+/* ---------------------------------------------------
+   BUDGET HELPER
+--------------------------------------------------- */
+function renderBudgetHelper() {
+  const div = document.getElementById("budgetResults");
 
-  let list = pubs.filter(p => p.avgPrice > 0);
-
-  if (leagueFilterType !== "all") {
-    list = list.filter(pub =>
-      prices.some(pr => pr.pubId === pub.id && pr.type === leagueFilterType)
-    );
+  if (!userBudget || !userMaxPrice) {
+    div.innerHTML = "Enter your budget above.";
+    return;
   }
 
-  if (mode === "cheapest") list.sort((a,b)=>a.avgPrice - b.avgPrice);
-  if (mode === "drops") list.sort((a,b)=>a.trendPercent24 - b.trendPercent24);
-  if (mode === "rises") list.sort((a,b)=>b.trendPercent24 - a.trendPercent24);
+  const b = parseFloat(userBudget);
+  const max = parseFloat(userMaxPrice);
 
-  const container = document.getElementById("pubTiles");
+  const possible = Math.floor(b / max);
 
-  container.innerHTML = list.map(pub => `
-    <div class="pub-tile" style="border-left-color:${trendColor(pub.trendPercent24)}">
+  let html = `
+    <strong>You can buy:</strong><br>
+    <strong>${possible} pint(s)</strong> at £${max.toFixed(2)} max per pint.<br><br>
+  `;
 
-      <div class="pub-header">
-        <span>${pub.name}</span>
-        <span>£${pub.avgPrice.toFixed(2)}</span>
-      </div>
+  const affordable = pubs.filter(pub => pub.avg && pub.avg <= max);
 
-      <div class="pub-badges">${pubBadges(pub)}</div>
+  if (affordable.length) {
+    html += `<strong>Pubs in your range:</strong><br>`;
+    html += affordable
+      .map(p => `${p.name} – £${p.avg.toFixed(2)} (${Math.floor(b/p.avg)} pints)`)
+      .join("<br>");
+  } else {
+    html += "No pubs fit your budget.";
+  }
 
-      <canvas class="spark" id="spark-${pub.id}"></canvas>
-    </div>
-  `).join("");
-
-  list.forEach(pub => drawSpark(pub.id));
+  div.innerHTML = html;
 }
 
-function pubBadges(pub) {
-  const b = [];
-  if (pub.avgPrice < 5) b.push("⭐ Cheap");
-  if (pub.trendPercent24 < -2) b.push("📉 Dropping");
-  if (pub.trendPercent24 > 2) b.push("📈 Rising");
-  return b.join(" • ") || "—";
-}
+document.getElementById("saveBudgetBtn").onclick = () => {
+  userBudget = document.getElementById("budgetInput").value;
+  userMaxPrice = document.getElementById("maxPriceInput").value;
+
+  localStorage.setItem("budget", userBudget);
+  localStorage.setItem("maxPrice", userMaxPrice);
+
+  renderBudgetHelper();
+  showToast("Budget updated!");
+};
 
 /* ---------------------------------------------------
    RECENT SUBMISSIONS
 --------------------------------------------------- */
-function renderRecentFeed() {
+function renderRecent() {
   const div = document.getElementById("recentFeedContent");
 
   const recent = [...prices]
     .sort((a,b)=>b.timestamp - a.timestamp)
-    .slice(0,8);
+    .slice(0,10);
 
   div.innerHTML = recent.map(r => {
-    const pub = pubs.find(p=>p.id===r.pubId)?.name || "Unknown Pub";
-    return `
-      <div class="feed-entry">
-        ${r.pintName} @ ${pub} (£${r.price.toFixed(2)})
-      </div>
-    `;
+    const pubName = pubs.find(p=>p.id===r.pubId)?.name || "Unknown Pub";
+    return `<div class="feed-entry">
+      ${r.pintName} @ ${pubName} (£${r.price.toFixed(2)})
+    </div>`;
   }).join("");
 }
 
@@ -400,26 +388,27 @@ function renderRecentFeed() {
 --------------------------------------------------- */
 function renderGoodInvestments() {
   const div = document.getElementById("goodInvestments");
-  const good = pubs.filter(p =>
-    p.avgPrice > 0 &&
-    p.trendPercent24 < -2
+
+  const opportunities = pubs.filter(p =>
+    p.avg && p.trend < -2
   );
 
-  if (!good.length) {
-    div.innerHTML = "No good opportunities right now.";
+  if (!opportunities.length) {
+    div.innerHTML = "No opportunities right now.";
     return;
   }
 
-  div.innerHTML = good.map(p =>
-    `💡 <b>${p.name}</b> — £${p.avgPrice.toFixed(2)} (↓ ${Math.abs(p.trendPercent24).toFixed(1)}%)`
+  div.innerHTML = opportunities.map(p =>
+    `💡 <strong>${p.name}</strong> — £${p.avg.toFixed(2)} (↓ ${Math.abs(p.trend).toFixed(1)}%)`
   ).join("<br>");
 }
 
 /* ---------------------------------------------------
-   ADMIN
+   TOASTS
 --------------------------------------------------- */
-function renderAdmin() {
-  if (!admin) return;
-  document.getElementById("adminContent").innerHTML =
-    `<pre>${JSON.stringify({ pubs, prices }, null, 2)}</pre>`;
+function showToast(msg) {
+  const t = document.getElementById("flashToast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
 }
