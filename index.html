@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Westminster Pints Exchange</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
 <body>
 
   <header>
@@ -32,6 +40,9 @@
     <h2>🍺 Add Pint Price</h2>
 
     <select id="pintPubSelect"></select>
+
+    <!-- NEW FIELD: Pint Name -->
+    <input id="pintNameInput" placeholder="Pint name (e.g. Peroni)">
 
     <select id="pintTypeSelect">
       <option value="Lager">🍺 Lager</option>
@@ -96,10 +107,13 @@
 
   <!-- Admin mode -->
   <div id="adminToggle">⚙️ Admin: OFF</div>
+
   <section id="adminPanel" class="card" style="display:none;">
     <h2>🛠️ Admin Panel</h2>
     <div id="adminContent"></div>
   </section>
 
   <script type="module" src="app.js"></script>
+
 </body>
+</html>
