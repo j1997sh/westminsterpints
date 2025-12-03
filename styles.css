@@ -10,6 +10,9 @@
   --text-light: #666;
   --card-bg: #fff;
   --shadow: 0 3px 12px rgba(0,0,0,0.08);
+  --green: #d8f5d2;
+  --red: #ffe0e0;
+  --grey: #f2f2f2;
 }
 
 html, body {
@@ -60,7 +63,7 @@ html, body {
 }
 
 /* ---------------------------------------------------
-   METRIC CARDS ROW
+   METRIC CARDS
 --------------------------------------------------- */
 .metric-row {
   display: flex;
@@ -137,7 +140,7 @@ html, body {
 }
 
 /* ---------------------------------------------------
-   INPUTS + BUTTONS
+   FORM ELEMENTS
 --------------------------------------------------- */
 label {
   font-size: 0.85rem;
@@ -168,7 +171,7 @@ button:hover {
 }
 
 /* ---------------------------------------------------
-   TWO COLUMN LAYOUT (desktop)
+   TWO COLUMN LAYOUT
 --------------------------------------------------- */
 .columns {
   display: block;
@@ -186,18 +189,20 @@ button:hover {
 }
 
 /* ---------------------------------------------------
-   FOOTBALL STYLE TABLES (PUB LEAGUE + DRINKS MENU)
+   TABLES (League + Drinks + Swing)
 --------------------------------------------------- */
 .league-table,
-.drinks-table {
+.drinks-table,
+.swing-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
 
 .league-table th,
-.drinks-table th {
-  background: #f2f2f2;
+.drinks-table th,
+.swing-table th {
+  background: var(--grey);
   padding: 8px;
   text-align: left;
   font-size: 0.9rem;
@@ -205,20 +210,87 @@ button:hover {
 }
 
 .league-table td,
-.drinks-table td {
+.drinks-table td,
+.swing-table td {
   padding: 8px;
   font-size: 0.95rem;
   border-bottom: 1px solid #eee;
 }
 
 .league-table tr:nth-child(even),
-.drinks-table tr:nth-child(even) {
+.drinks-table tr:nth-child(even),
+.swing-table tr:nth-child(even) {
   background: #fafafa;
 }
 
-.league-table tr:hover,
-.drinks-table tr:hover {
-  background: #f0f8ff;
+.swing-positive {
+  background: #e8fbe6 !important;
+}
+
+.swing-negative {
+  background: #ffeaea !important;
+}
+
+/* ---------------------------------------------------
+   CLUSTER DETECTOR
+--------------------------------------------------- */
+#clusterContent {
+  margin-top: 10px;
+  font-size: 0.95rem;
+}
+
+.cluster-group {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.cluster-group h3 {
+  margin: 0 0 6px;
+}
+
+/* ---------------------------------------------------
+   RARITY LIST
+--------------------------------------------------- */
+.rarity-list {
+  padding-left: 18px;
+  font-size: 1rem;
+}
+
+.rarity-list li {
+  margin: 6px 0;
+}
+
+/* ---------------------------------------------------
+   MODAL POPUP
+--------------------------------------------------- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: #fff;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 14px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+}
+
+.modal-close {
+  float: right;
+  font-size: 1.6rem;
+  cursor: pointer;
 }
 
 /* ---------------------------------------------------
@@ -231,14 +303,14 @@ button:hover {
 }
 
 /* ---------------------------------------------------
-   BOTTOM NAV
+   BOTTOM NAV (5 ICONS)
 --------------------------------------------------- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
   height: 68px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.97);
   border-top: 1px solid #ccc;
   display: flex;
   justify-content: space-around;
@@ -248,11 +320,13 @@ button:hover {
 
 .nav-item {
   text-align: center;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
+  width: 20%;
 }
 
 .nav-item div {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
+  margin-top: 2px;
 }
 
 @media (min-width: 900px) {
