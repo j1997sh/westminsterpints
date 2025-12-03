@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Westminster Pints Test</title>
+</head>
+<body>
+  <h1>Testing Firebase...</h1>
+
+  <div id="output">Loading...</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { 
+      getFirestore, collection, getDocs 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBHUGgt8F4OQJjdx11qOMPC0iRJGFZmU8E",
+      authDomain: "westminsterpints.firebaseapp.com",
+      projectId: "westminsterpints",
+      storageBucket: "westminsterpints.appspot.com",
+      messagingSenderId: "913960848966",
+      appId: "1:913960848966:web:df6355a6b5b25dbdc5c447",
+      measurementId: "G-E9SNYKYEBN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Test: get all pubs
+    const querySnapshot = await getDocs(collection(db, "pubs"));
+    
+    let text = "";
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      text += `<p>${doc.id}: ${JSON.stringify(data)}</p>`;
+    });
+
+    document.getElementById("output").innerHTML = text || "No pubs found.";
+  </script>
+
+</body>
+</html>
