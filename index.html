@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Westminster Pints Exchange</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=23">
 </head>
 
 <body>
@@ -20,9 +20,8 @@
     <div id="cheapestBannerText">Finding cheapest pint…</div>
   </section>
 
-  <!-- METRIC CARDS ROW (now only 2 cards) -->
+  <!-- METRICS -->
   <section class="metric-row">
-
     <div class="metric-card">
       <h3>🍺 Most Popular Today</h3>
       <div id="popularPintValue" class="metric-small">—</div>
@@ -32,10 +31,9 @@
       <h3>📊 Top Types This Week</h3>
       <div id="weeklyTypesValue" class="metric-small">—</div>
     </div>
-
   </section>
 
-  <!-- LIVE TICKER -->
+  <!-- TICKER -->
   <section id="liveTicker" class="ticker">
     <div id="tickerText">Loading market activity…</div>
   </section>
@@ -92,40 +90,40 @@
       <div id="cheapestPintResult" class="subnote" style="margin-top:10px;">—</div>
     </section>
 
-    <!-- BUDGET PLANNER V2 -->
+    <!-- BUDGET PLANNER -->
     <section class="card" id="budgetPlannerCard">
       <h2>💰 Budget Planner</h2>
 
       <label>Your Budget (£):</label>
-      <input id="budgetInput" type="number" placeholder="e.g. 20">
+      <input id="budgetInput" type="number">
 
       <label>Max Price Per Pint (£):</label>
-      <input id="budgetMaxInput" type="number" placeholder="e.g. 6">
+      <input id="budgetMaxInput" type="number">
 
       <button id="runBudgetBtn">Find Best Pub 🎯</button>
 
-      <div id="budgetResult" style="margin-top:12px;" class="subnote">Enter a budget to begin.</div>
+      <div id="budgetResult" class="subnote" style="margin-top:12px;">Enter a budget to begin.</div>
     </section>
 
-    <!-- TWO-COLUMN LAYOUT -->
+    <!-- TWO COLUMNS -->
     <div class="columns">
 
-      <!-- LEFT -->
+      <!-- LEFT COLUMN -->
       <div class="col-left">
 
         <section class="card" id="pinxCard">
           <h2>📈 PINX Market Summary</h2>
           <div id="pinxValue" class="metric">—</div>
           <div id="moneyInvestedInline" class="metric-small">—</div>
-          <p class="subnote">PINX tracks the average pint price across Westminster.</p>
+          <p class="subnote">PINX tracks average pint price across Westminster.</p>
         </section>
 
       </div>
 
-      <!-- RIGHT -->
+      <!-- RIGHT COLUMN -->
       <div class="col-right">
 
-        <!-- PUB LEAGUE (FOOTBALL STYLE) -->
+        <!-- PUB LEAGUE -->
         <section class="card" id="pubLeagueCard">
           <h2>📊 Pub League Table</h2>
 
@@ -149,12 +147,10 @@
           <table class="league-table" id="expensiveTable"></table>
 
           <button id="showAllPubsBtn">Show Full League ▼</button>
-
           <table class="league-table" id="fullLeagueTable" style="display:none;"></table>
-
         </section>
 
-        <!-- DRINKS MENU (NEW) -->
+        <!-- DRINKS MENU -->
         <section class="card" id="drinksMenuCard">
           <h2>📜 Drinks Menu</h2>
 
@@ -164,7 +160,33 @@
           <table id="drinksMenuTable" class="drinks-table"></table>
         </section>
 
-        <!-- RECENT FEED -->
+        <!-- NEW CARD 1: Swing-o-Meter -->
+        <section class="card" id="swingCard">
+          <h2>🗳️ Pint Availability Swing-o-Meter</h2>
+          <p class="subnote">Which pints gained or lost availability this week.</p>
+          <table id="swingTable" class="swing-table"></table>
+        </section>
+
+        <!-- NEW CARD 2: Pint Clusters -->
+        <section class="card" id="clusterCard">
+          <h2>📊 Pint Cluster Detector</h2>
+          <p class="subnote">Automatic price tier grouping based on Westminster data.</p>
+          <div id="clusterContent"></div>
+        </section>
+
+        <!-- NEW CARD 3: Rarity Key -->
+        <section class="card" id="rarityCard">
+          <h2>💎 Pint Rarity Key</h2>
+          <ul class="rarity-list">
+            <li>🍺 Common (10+ pubs)</li>
+            <li>⭐ Popular (6–9 pubs)</li>
+            <li>🔶 Limited (3–5 pubs)</li>
+            <li>🟥 Rare (1–2 pubs)</li>
+            <li>❌ Not Sold</li>
+          </ul>
+        </section>
+
+        <!-- RECENT SUBMISSIONS -->
         <section class="card" id="recentFeedCard">
           <h2>📰 Recent Submissions</h2>
           <div id="recentFeed"></div>
@@ -172,19 +194,31 @@
 
       </div>
     </div>
-
   </main>
 
-  <!-- BOTTOM NAV -->
+  <!-- MOBILE NAV -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="scrollToId('addPintCard')">🍺<div>Add</div></div>
     <div class="nav-item" onclick="scrollToId('pubLeagueCard')">📊<div>League</div></div>
+    <div class="nav-item" onclick="scrollToId('drinksMenuCard')">📜<div>Menu</div></div>
+    <div class="nav-item" onclick="scrollToId('swingCard')">🗳️<div>Swing</div></div>
     <div class="nav-item" onclick="scrollToId('recentFeedCard')">📰<div>Feed</div></div>
   </nav>
 
+  <!-- MODAL POPUP FOR "VIEW THESE PUBS" -->
+  <div id="pubModal" class="modal">
+    <div class="modal-content">
+      <span id="modalClose" class="modal-close">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <ul id="modalPubList"></ul>
+    </div>
+  </div>
+
+  <!-- TOAST -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="app.js?v=21"></script>
+  <!-- JS -->
+  <script type="module" src="app.js?v=23"></script>
   <script>
     function scrollToId(id){
       document.getElementById(id).scrollIntoView({behavior:"smooth"});
