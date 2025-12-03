@@ -7,22 +7,54 @@
   --gold: #FFD55A;
   --green: #00A676;
   --red: #D7263D;
-  --bg: #F4F5F7;
+  --bg: #F5F6FA;
   --text-dark: #1C1C1E;
 }
 
 /* ---------------------------------------------------
-   BODY
+   BODY & GRID
 --------------------------------------------------- */
 body {
   font-family: system-ui, sans-serif;
-  margin: 0;
   background: var(--bg);
+  margin: 0;
+  padding-bottom: 90px;
   color: var(--text-dark);
+}
+
+/* Strict 2-column desktop layout */
+#grid {
+  display: flex;
+  flex-direction: column;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-bottom: 90px; /* space for bottom-nav */
+  margin: auto;
+}
+
+.col {
+  width: 100%;
+}
+
+.col-full {
+  width: 100%;
+}
+
+@media (min-width: 1100px) {
+  #grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 24px;
+    padding: 0 20px;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .col-full {
+    grid-column: 1 / span 2;
+  }
 }
 
 /* ---------------------------------------------------
@@ -32,38 +64,49 @@ body {
   background: linear-gradient(135deg, var(--blue), var(--blue-dark));
   color: white;
   text-align: center;
-  padding: 20px 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 16px 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
+
 .top-header h1 {
-  font-size: 26px;
   margin: 0;
+  font-size: 26px;
 }
+
 .subtitle {
-  margin-top: 4px;
+  margin: 6px 0 0;
   opacity: 0.9;
+  font-size: 14px;
 }
 
 /* ---------------------------------------------------
-   DESKTOP NAV (hidden on mobile)
+   DESKTOP NAV
 --------------------------------------------------- */
 .top-nav-desktop {
   display: none;
   background: var(--blue);
   color: white;
-  padding: 10px 20px;
-  gap: 20px;
-  align-items: center;
+  padding: 12px 30px;
+  gap: 30px;
+  font-size: 16px;
   justify-content: center;
-  font-weight: 500;
 }
+
 .top-nav-desktop div {
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 6px 14px;
+  border-radius: 8px;
 }
+
 .top-nav-desktop div:hover {
   background: var(--blue-dark);
-  border-radius: 8px;
+}
+
+@media (min-width: 1100px) {
+  .top-nav-desktop {
+    display: flex;
+  }
 }
 
 /* ---------------------------------------------------
@@ -71,46 +114,55 @@ body {
 --------------------------------------------------- */
 .card {
   background: white;
-  width: 94%;
-  max-width: 500px;
-  margin: 18px auto;
   padding: 22px;
+  margin: 12px auto;
   border-radius: 16px;
+  width: 92%;
+  max-width: 520px;
   box-shadow:
-    0 4px 14px rgba(0,0,0,0.06),
-    0 0 0 1px rgba(0,0,0,0.04);
-  animation: fadeUp 0.35s ease;
+    0 3px 10px rgba(0,0,0,0.07),
+    0 1px 3px rgba(0,0,0,0.06);
+  transition: 0.2s ease;
 }
 
-.card.highlight {
-  border-left: 6px solid var(--blue);
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+      0 6px 18px rgba(0,0,0,0.10),
+      0 2px 4px rgba(0,0,0,0.08);
 }
 
-/* Desktop: 2-column layout */
 @media (min-width: 1100px) {
   .card {
-    width: 45%;
-    display: inline-block;
-    margin: 14px 2%;
-    vertical-align: top;
+    width: 100%;
+    margin: 0;
   }
-  .card.full-width {
-    width: 94%;
-    max-width: none;
-  }
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 19px;
+}
+
+.metric {
+  font-size: 26px;
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------
-   INPUTS & BUTTONS
+   INPUTS + BUTTONS
 --------------------------------------------------- */
 input, select, button {
   padding: 12px;
-  margin: 6px 3px;
+  margin: 6px 0;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #bbb;
   font-size: 15px;
   width: 100%;
+  max-width: 420px;
+  display: block;
 }
+
 button {
   background: var(--blue);
   color: white;
@@ -118,49 +170,20 @@ button {
   cursor: pointer;
   font-weight: 600;
 }
+
 button:hover {
   background: var(--blue-dark);
 }
 
-/* Desktop input adjustments */
-@media (min-width: 1100px) {
-  input, select {
-    width: 100%;
-  }
-}
-
 /* ---------------------------------------------------
-   TYPOGRAPHY
---------------------------------------------------- */
-h2 {
-  font-size: 20px;
-  margin-top: 0;
-}
-.metric {
-  font-size: 28px;
-  font-weight: 700;
-}
-.top-metric {
-  font-size: 26px;
-  font-weight: 700;
-}
-
-@media (min-width: 1100px) {
-  h2 { font-size: 18px; }
-  .metric { font-size: 24px; }
-  .top-metric { font-size: 22px; }
-}
-
-/* ---------------------------------------------------
-   PUB TILES GRID
+   PUB TILE GRID
 --------------------------------------------------- */
 .pub-tiles-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 
-/* Desktop: multi-column */
 @media (min-width: 1100px) {
   .pub-tiles-grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -171,67 +194,73 @@ h2 {
   background: white;
   border-radius: 14px;
   padding: 16px;
-  box-shadow:
-    0 3px 8px rgba(0,0,0,0.05),
-    0 0 0 1px rgba(0,0,0,0.04);
+  border-left: 6px solid #ccc;
   cursor: pointer;
-  transition: 0.15s ease;
-  border-left: 6px solid #ddd;
+  transition: 0.2s ease;
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.05),
+    0 1px 3px rgba(0,0,0,0.04);
 }
+
 .pub-tile:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+  transform: translateY(-4px);
+  box-shadow:
+    0 6px 20px rgba(0,0,0,0.12),
+    0 2px 4px rgba(0,0,0,0.08);
 }
 
 .pub-header {
   display: flex;
   justify-content: space-between;
   font-weight: 600;
-  font-size: 18px;
+  margin-bottom: 8px;
 }
+
 .pub-badges {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 6px;
 }
 
 .spark {
   width: 100%;
   height: 35px;
-  margin-top: 10px;
 }
 
 /* ---------------------------------------------------
    POLLING INTENT
 --------------------------------------------------- */
-#pollingBars {
-  margin-top: 10px;
-}
 .poll-bar {
-  background: #ddd;
-  border-radius: 6px;
+  background: #e5e5e5;
+  border-radius: 8px;
   margin: 8px 0;
   position: relative;
+  overflow: hidden;
 }
+
 .poll-fill {
   height: 22px;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: var(--blue);
   transition: width 0.4s ease;
 }
-.poll-type-label {
-  position: absolute;
-  left: 8px;
-  top: 2px;
-  font-size: 14px;
-  font-weight: 600;
-}
+
+.poll-type-label,
 .poll-percent {
   position: absolute;
-  right: 8px;
   top: 2px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
+
+.poll-type-label {
+  left: 8px;
+}
+
+.poll-percent {
+  right: 8px;
+}
+
 .polling-leader {
   margin-top: 10px;
   font-style: italic;
@@ -246,37 +275,47 @@ h2 {
   flex-direction: column;
   gap: 12px;
 }
+
 .mini-stat {
   background: var(--bg);
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
-  font-size: 16px;
 }
+
 @media (min-width: 1100px) {
   #miniStatsContent {
     flex-direction: row;
-    justify-content: space-between;
   }
   .mini-stat {
     flex: 1;
-    margin: 0 6px;
   }
 }
 
 /* ---------------------------------------------------
-   RECENT SUBMISSIONS FEED
+   RECENT FEED
 --------------------------------------------------- */
-#recentFeedContent {
-  font-size: 15px;
-  line-height: 1.45;
-}
 .feed-entry {
   padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ddd;
 }
 
 /* ---------------------------------------------------
-   FLASH TOAST
+   ADMIN BUTTON
+--------------------------------------------------- */
+#adminToggle {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--blue);
+  color: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 200;
+}
+
+/* ---------------------------------------------------
+   TOAST
 --------------------------------------------------- */
 .flash-toast {
   position: fixed;
@@ -286,32 +325,15 @@ h2 {
   color: white;
   padding: 14px 18px;
   border-radius: 12px;
-  font-size: 15px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   opacity: 0;
   transform: translateY(20px);
-  transition: all 0.4s ease;
+  transition: 0.4s ease;
   z-index: 500;
 }
+
 .flash-toast.show {
   opacity: 1;
   transform: translateY(0);
-}
-
-/* ---------------------------------------------------
-   ADMIN TOGGLE
---------------------------------------------------- */
-#adminToggle {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  background: var(--blue);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 500;
-  z-index: 300;
 }
 
 /* ---------------------------------------------------
@@ -322,36 +344,28 @@ h2 {
   bottom: 0;
   width: 100%;
   height: 75px;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.9);
   backdrop-filter: blur(10px);
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #ccc;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 200;
+  z-index: 300;
 }
 
 .nav-item {
   text-align: center;
+  font-size: 15px;
   cursor: pointer;
-  font-size: 14px;
-  color: var(--blue);
 }
+
 .nav-item div {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 2px;
 }
 
-/* Hide mobile nav on desktop */
-@media (min-width: 1100px) {
-  .bottom-nav { display: none; }
-  .top-nav-desktop { display: flex; }
-}
-
-/* ---------------------------------------------------
-   ANIMATIONS
---------------------------------------------------- */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+@media (min-width:1100px) {
+  .bottom-nav {
+    display: none;
+  }
 }
