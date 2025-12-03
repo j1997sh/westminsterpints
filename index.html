@@ -3,156 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <title>Westminster Pints Exchange</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
 <body>
 
-  <!-- DESKTOP NAV -->
-  <nav class="top-nav-desktop">
-    <div onclick="scrollToSection('budgetHelper')">👛 Budget</div>
-    <div onclick="scrollToSection('pollingIntent')">🗳️ Polling</div>
-    <div onclick="scrollToSection('addPintCard')">🍺 Add Pint</div>
-    <div onclick="scrollToSection('pubLeague')">📊 League</div>
-    <div onclick="scrollToSection('recentFeed')">📰 Feed</div>
-  </nav>
+  <!-- Hidden admin access -->
+  <a id="secret-admin-link" href="admin.html">‎</a>
 
   <!-- HEADER -->
   <header class="top-header">
     <h1>🍻 Westminster Pints Exchange</h1>
-    <p class="subtitle">Real-time pint prices across the Westminster Village</p>
+    <p class="subtitle">Real-time pint prices across Westminster Village</p>
   </header>
 
-  <!-- GRID WRAPPER -->
-  <main id="grid">
+  <!-- PINX + Cheapest -->
+  <main class="content">
 
-    <!-- LEFT COLUMN -->
-    <section class="col">
-
-      <!-- Budget Helper -->
-      <div class="card" id="budgetHelper">
-        <h2>👛 Pint Budget Helper</h2>
-        <label>Your Daily Budget:</label>
-        <input id="budgetInput" type="number" placeholder="£ (e.g. 15)">
-        <label>Maximum Price Per Pint:</label>
-        <input id="maxPriceInput" type="number" placeholder="£ (e.g. 6)">
-        <button id="saveBudgetBtn">Save Budget Settings</button>
-        <div id="budgetResults" class="budget-output"></div>
+    <!-- PINX -->
+    <section class="card" id="pinxCard">
+      <h2>📈 PINX Index</h2>
+      <div id="pinxValue" class="metric">—</div>
+      <div id="pinxNote" class="subnote">
+        PINX tracks the average price of pints across Westminster.
       </div>
-
-      <!-- Cheapest Pint -->
-      <div class="card" id="cheapestCard">
-        <h2>🏆 Cheapest Pint Right Now</h2>
-        <div id="cheapestTop" class="metric">Loading...</div>
-      </div>
-
-      <!-- Add Pint -->
-      <div class="card" id="addPintCard">
-        <h2>🍺 Add Pint Price</h2>
-        <select id="pintPubSelect"></select>
-        <input id="pintNameInput" placeholder="Pint name (e.g. Peroni)">
-        <select id="pintTypeSelect">
-          <option value="Lager">🍺 Lager</option>
-          <option value="Ale">🍻 Ale</option>
-          <option value="IPA">🟢 IPA</option>
-          <option value="Guinness">⚫ Guinness</option>
-          <option value="Cider">🟡 Cider</option>
-        </select>
-        <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
-        <button id="addPintBtn">Add Price 💷</button>
-      </div>
-
     </section>
 
-    <!-- RIGHT COLUMN -->
-    <section class="col">
-
-      <!-- PINX -->
-      <div class="card" id="pinxCard">
-        <h2>📈 PINX Index</h2>
-        <div id="pinxValue" class="metric">Loading...</div>
-      </div>
-
-      <!-- Add Pub -->
-      <div class="card" id="addPubCard">
-        <h2>➕ Add Pub</h2>
-        <input id="pubNameInput" placeholder="Pub name">
-        <button id="addPubBtn">Add Pub 🏛️</button>
-      </div>
-
-      <!-- Polling Intent -->
-      <div class="card" id="pollingIntent">
-        <h2>🗳️ Pint Polling Intent</h2>
-        <div id="pollingBars"></div>
-        <div id="pollingLeader" class="polling-leader"></div>
-      </div>
-
+    <!-- Cheapest -->
+    <section class="card" id="cheapestCard">
+      <h2>🏆 Cheapest Pint Right Now</h2>
+      <div id="cheapestTop" class="metric">—</div>
     </section>
 
-    <!-- FULL WIDTH BELOW -->
-    <section class="col-full">
-      <div class="card" id="miniStats">
-        <h2>📊 Market Mini-Stats</h2>
-        <div id="miniStatsContent"></div>
+    <!-- League -->
+    <section class="card" id="pubLeague">
+      <h2>📊 Pub League</h2>
+
+      <label class="label">Filter by Pint Type:</label>
+      <select id="leagueFilter"></select>
+
+      <h3 class="league-subhead">Top 5 Cheapest</h3>
+      <div id="topCheapest" class="pub-tiles-grid"></div>
+
+      <h3 class="league-subhead">Top 5 Most Expensive</h3>
+      <div id="topExpensive" class="pub-tiles-grid"></div>
+
+      <div id="showAllWrapper">
+        <button id="showAllBtn">Show All ▼</button>
       </div>
 
-      <div class="card full-width" id="pubLeague">
-        <h2>📊 Pub League</h2>
-        <label>Filter League by Pint Type:</label>
-        <select id="leagueFilter">
-          <option value="all">All Types</option>
-          <option value="Lager">Lager</option>
-          <option value="Ale">Ale</option>
-          <option value="IPA">IPA</option>
-          <option value="Guinness">Guinness</option>
-          <option value="Cider">Cider</option>
-        </select>
-        <select id="leagueMode">
-          <option value="cheapest">Cheapest</option>
-          <option value="drops">Biggest Drops</option>
-          <option value="rises">Biggest Rises</option>
-        </select>
-        <div id="pubTiles" class="pub-tiles-grid"></div>
-      </div>
+      <div id="allPubs" class="pub-tiles-grid" style="display:none;"></div>
+    </section>
 
-      <div class="card" id="recentFeed">
-        <h2>📰 Recent Submissions</h2>
-        <div id="recentFeedContent"></div>
-      </div>
+    <!-- Add Pint -->
+    <section class="card" id="addPintCard">
+      <h2>🍺 Add Pint Price</h2>
 
-      <div class="card" id="goodInvestmentsSection">
-        <h2>💡 Good Investments</h2>
-        <div id="goodInvestments"></div>
-      </div>
+      <label class="label">Pub:</label>
+      <select id="pintPubSelect"></select>
+
+      <label class="label">Pint:</label>
+      <select id="pintSelect"></select>
+
+      <label class="label">Price (£):</label>
+      <input id="pintPriceInput" type="number" step="0.01">
+
+      <button id="addPintBtn">Add Price 💷</button>
+    </section>
+
+    <!-- Budget Helper -->
+    <section class="card" id="budgetHelper">
+      <h2>👛 Pint Budget Helper</h2>
+
+      <label>Your Daily Budget (£):</label>
+      <input id="budgetInput" type="number" placeholder="e.g. 20">
+
+      <label>Maximum Price Per Pint (£):</label>
+      <input id="maxPriceInput" type="number" placeholder="e.g. 6">
+
+      <button id="saveBudgetBtn">Save Budget Settings</button>
+
+      <div id="budgetResults" class="budget-output"></div>
+    </section>
+
+    <!-- Add Pub -->
+    <section class="card" id="addPubCard">
+      <h2>➕ Add Pub</h2>
+
+      <label>Pub Name:</label>
+      <input id="pubNameInput" type="text">
+
+      <button id="addPubBtn">Add Pub 🏛️</button>
+    </section>
+
+    <!-- Recent Submissions -->
+    <section class="card" id="recentFeed">
+      <h2>📰 Recent Submissions</h2>
+      <div id="recentFeedContent"></div>
+    </section>
+
+    <!-- Good Investments -->
+    <section class="card" id="goodInvestmentsSection">
+      <h2>💡 Good Investments</h2>
+      <div id="goodInvestments"></div>
     </section>
 
   </main>
 
-  <!-- Admin -->
-  <div id="adminToggle">⚙️ Admin: OFF</div>
-  <section id="adminPanel" class="card" style="display:none;">
-    <h2>🛠️ Admin Panel</h2>
-    <div id="adminContent"></div>
-  </section>
+  <!-- Mobile nav -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="scrollToId('pinxCard')">📈<div>PINX</div></div>
+    <div class="nav-item" onclick="scrollToId('pubLeague')">📊<div>League</div></div>
+    <div class="nav-item" onclick="scrollToId('addPintCard')">🍺<div>Add Pint</div></div>
+    <div class="nav-item" onclick="scrollToId('recentFeed')">📰<div>Feed</div></div>
+  </nav>
 
   <!-- Toast -->
   <div id="flashToast" class="flash-toast"></div>
 
-  <!-- MOBILE NAV -->
-  <nav class="bottom-nav">
-    <div onclick="scrollToSection('budgetHelper')" class="nav-item">👛<div>Budget</div></div>
-    <div onclick="scrollToSection('pollingIntent')" class="nav-item">🗳️<div>Polls</div></div>
-    <div onclick="scrollToSection('addPintCard')" class="nav-item">🍺<div>Add</div></div>
-    <div onclick="scrollToSection('pubLeague')" class="nav-item">📊<div>League</div></div>
-    <div onclick="scrollToSection('recentFeed')" class="nav-item">📰<div>Feed</div></div>
-  </nav>
-
-  <!-- JS With Cache-Buster -->
-  <script type="module" src="app.js?v=4"></script>
-
+  <script type="module" src="app.js?v=5"></script>
   <script>
-    function scrollToSection(id){
-      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    function scrollToId(id){
+      document.getElementById(id).scrollIntoView({behavior:"smooth"});
     }
   </script>
 
