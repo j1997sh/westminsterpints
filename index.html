@@ -8,40 +8,30 @@
 
 <body>
 
-  <header>
+  <!-- HEADER -->
+  <header class="top-header">
     <h1>🍻 Westminster Pints Exchange</h1>
-    <p class="subtitle">Live pub prices from the heart of British politics</p>
+    <p class="subtitle">Live pub prices from the heart of politics</p>
   </header>
 
-  <!-- PINX Index -->
+  <!-- CHEAPEST PINT AT TOP -->
+  <section class="card highlight">
+    <h2>🏆 Cheapest Pint Right Now</h2>
+    <div id="cheapestTop" class="top-metric">Loading...</div>
+  </section>
+
+  <!-- PINX INDEX -->
   <section class="card">
     <h2>📈 PINX Index</h2>
     <div id="pinxValue" class="metric">Loading...</div>
   </section>
 
-  <!-- Cheapest Pint -->
-  <section class="card">
-    <h2>🏆 Cheapest Pint Right Now</h2>
-    <div id="cheapestValue" class="metric">Loading...</div>
-  </section>
-
-  <!-- Add Pub -->
-  <section class="card">
-    <h2>➕ Add Pub</h2>
-    <input id="pubNameInput" placeholder="Pub name">
-    <select id="pubCategoryInput">
-      <option value="Westminster">Westminster</option>
-    </select>
-    <button id="addPubBtn">Add Pub 🏛️</button>
-  </section>
-
-  <!-- Add Pint -->
-  <section class="card">
+  <!-- ADD PINT PRICE -->
+  <section class="card" id="addPintCard">
     <h2>🍺 Add Pint Price</h2>
 
     <select id="pintPubSelect"></select>
 
-    <!-- NEW FIELD: Pint Name -->
     <input id="pintNameInput" placeholder="Pint name (e.g. Peroni)">
 
     <select id="pintTypeSelect">
@@ -56,7 +46,17 @@
     <button id="addPintBtn">Add Price 💷</button>
   </section>
 
-  <!-- Pint Type Filter -->
+  <!-- ADD PUB -->
+  <section class="card">
+    <h2>➕ Add Pub</h2>
+    <input id="pubNameInput" placeholder="Pub name">
+    <select id="pubCategoryInput">
+      <option value="Westminster">Westminster</option>
+    </select>
+    <button id="addPubBtn">Add Pub 🏛️</button>
+  </section>
+
+  <!-- FILTER -->
   <section class="card">
     <h2>🔎 Filter by Pint Type</h2>
     <select id="filterType">
@@ -69,51 +69,49 @@
     </select>
   </section>
 
-  <!-- League Table -->
+  <!-- COLLAPSIBLE PUB TILES (LEAGUE TABLE) -->
   <section class="card">
-    <h2>📊 League Table</h2>
+    <h2>📊 Pub League</h2>
 
     <select id="leagueMode">
-      <option value="cheapest">Cheapest Pubs</option>
-      <option value="drops">Biggest Price Drops</option>
-      <option value="rises">Biggest Price Rises</option>
+      <option value="cheapest">Cheapest</option>
+      <option value="drops">Biggest Drops</option>
+      <option value="rises">Biggest Rises</option>
       <option value="volatile">Most Volatile</option>
     </select>
 
-    <table id="leagueTable">
-      <thead>
-        <tr>
-          <th>Pub 🏛️</th>
-          <th>Avg Price 💷</th>
-          <th>24h Trend 📉📈</th>
-          <th>Trend 📊</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div id="pubTiles"></div>
   </section>
 
-  <!-- Good Investments -->
+  <!-- GOOD INVESTMENTS -->
   <section class="card">
     <h2>💡 Good Investments</h2>
     <div id="goodInvestments"></div>
   </section>
 
-  <!-- Full Pub List -->
-  <section class="card">
-    <h2>📋 All Pubs</h2>
-    <div id="pubList"></div>
-  </section>
-
-  <!-- Admin mode -->
+  <!-- ADMIN -->
   <div id="adminToggle">⚙️ Admin: OFF</div>
-
   <section id="adminPanel" class="card" style="display:none;">
     <h2>🛠️ Admin Panel</h2>
     <div id="adminContent"></div>
   </section>
 
+  <!-- BOTTOM NAV (MOBILE APP STYLE) -->
+  <nav class="bottom-nav">
+    <div class="nav-item" onclick="scrollToSection('addPintCard')">🍺<br>Add Pint</div>
+    <div class="nav-item" onclick="scrollToSection('pubTiles')">📊<br>League</div>
+    <div class="nav-item" onclick="scrollToSection('goodInvestments')">💡<br>Invest</div>
+    <div class="nav-item" onclick="scrollToSection('filterType')">🔎<br>Filter</div>
+    <div class="nav-item" onclick="scrollToSection('adminToggle')">⚙️<br>Admin</div>
+  </nav>
+
   <script type="module" src="app.js"></script>
+
+  <script>
+    function scrollToSection(id){
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    }
+  </script>
 
 </body>
 </html>
