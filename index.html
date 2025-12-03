@@ -1,55 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Westminster Pints Exchange</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-
 <body>
 
-  <h1>Westminster Pints Exchange</h1>
+  <header>
+    <h1>🍻 Westminster Pints Exchange</h1>
+    <p class="subtitle">Live pub prices from the heart of British politics</p>
+  </header>
 
   <!-- PINX Index -->
-  <section id="pinxSection">
-    <h2>PINX Index</h2>
-    <div id="pinxValue">Loading...</div>
+  <section class="card">
+    <h2>📈 PINX Index</h2>
+    <div id="pinxValue" class="metric">Loading...</div>
   </section>
 
   <!-- Cheapest Pint -->
-  <section id="cheapestSection">
-    <h2>Cheapest Pint Right Now</h2>
-    <div id="cheapestValue">Loading...</div>
+  <section class="card">
+    <h2>🏆 Cheapest Pint Right Now</h2>
+    <div id="cheapestValue" class="metric">Loading...</div>
   </section>
 
   <!-- Add Pub -->
-  <section id="addPubSection">
-    <h2>Add Pub</h2>
+  <section class="card">
+    <h2>➕ Add Pub</h2>
     <input id="pubNameInput" placeholder="Pub name">
     <select id="pubCategoryInput">
       <option value="Westminster">Westminster</option>
     </select>
-    <button id="addPubBtn">Add Pub</button>
+    <button id="addPubBtn">Add Pub 🏛️</button>
   </section>
 
   <!-- Add Pint -->
-  <section id="addPintSection">
-    <h2>Add Pint Price</h2>
+  <section class="card">
+    <h2>🍺 Add Pint Price</h2>
+
     <select id="pintPubSelect"></select>
+
     <select id="pintTypeSelect">
+      <option value="Lager">🍺 Lager</option>
+      <option value="Ale">🍻 Ale</option>
+      <option value="IPA">🟢 IPA</option>
+      <option value="Guinness">⚫ Guinness</option>
+      <option value="Cider">🟡 Cider</option>
+    </select>
+
+    <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
+    <button id="addPintBtn">Add Price 💷</button>
+  </section>
+
+  <!-- Pint Type Filter -->
+  <section class="card">
+    <h2>🔎 Filter by Pint Type</h2>
+    <select id="filterType">
+      <option value="all">All Types</option>
       <option value="Lager">Lager</option>
       <option value="Ale">Ale</option>
       <option value="IPA">IPA</option>
       <option value="Guinness">Guinness</option>
       <option value="Cider">Cider</option>
     </select>
-    <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
-    <button id="addPintBtn">Add Pint Price</button>
   </section>
 
   <!-- League Table -->
-  <section id="leagueSection">
-    <h2>League Table</h2>
+  <section class="card">
+    <h2>📊 League Table</h2>
+
     <select id="leagueMode">
       <option value="cheapest">Cheapest Pubs</option>
       <option value="drops">Biggest Price Drops</option>
@@ -60,10 +72,10 @@
     <table id="leagueTable">
       <thead>
         <tr>
-          <th>Pub</th>
-          <th>Avg Price</th>
-          <th>24h %</th>
-          <th>Sparkline</th>
+          <th>Pub 🏛️</th>
+          <th>Avg Price 💷</th>
+          <th>24h Trend 📉📈</th>
+          <th>Trend 📊</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -71,25 +83,23 @@
   </section>
 
   <!-- Good Investments -->
-  <section id="goodInvestmentsSection">
-    <h2>Good Investments (Pubs)</h2>
+  <section class="card">
+    <h2>💡 Good Investments</h2>
     <div id="goodInvestments"></div>
   </section>
 
   <!-- Full Pub List -->
-  <section id="pubListSection">
-    <h2>All Pubs</h2>
+  <section class="card">
+    <h2>📋 All Pubs</h2>
     <div id="pubList"></div>
   </section>
 
   <!-- Admin mode -->
-  <div id="adminToggle">Admin: OFF</div>
-  <section id="adminPanel" style="display:none;">
-    <h2>Admin Panel</h2>
+  <div id="adminToggle">⚙️ Admin: OFF</div>
+  <section id="adminPanel" class="card" style="display:none;">
+    <h2>🛠️ Admin Panel</h2>
     <div id="adminContent"></div>
   </section>
 
   <script type="module" src="app.js"></script>
-
 </body>
-</html>
