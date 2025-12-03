@@ -32,14 +32,10 @@ let pintNames = [];
 let prices = [];
 
 let showAllLeague = false;
-
 let previousPINX = null;
 
-let userBudget = localStorage.getItem("budget") || null;
-let userMax = localStorage.getItem("maxprice") || null;
-
 /* ---------------------------------------------------
-   FIREBASE SNAPSHOTS
+   SNAPSHOTS
 --------------------------------------------------- */
 onSnapshot(collection(db, "pubs"), snap => {
   pubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -63,6 +59,7 @@ function refresh() {
   populatePubSelect();
   populatePintNameSelect();
   populateLeaguePintName();
+  populateDrinksMenuPubDropdown();
   computePubStats();
   renderCheapestBanner();
   renderPopularToday();
@@ -72,8 +69,8 @@ function refresh() {
   renderTicker();
   renderCheapestByPintName();
   renderLeague();
+  renderDrinksMenu(); // new
   renderRecent();
-  renderBudget();
 }
 
 /* ---------------------------------------------------
@@ -81,21 +78,34 @@ function refresh() {
 --------------------------------------------------- */
 function populatePubSelect() {
   const sel = document.getElementById("pintPubSelect");
+  if (!sel) return;
   sel.innerHTML = pubs.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
 }
 
 function populatePintNameSelect() {
   const sel = document.getElementById("pintNameSelect");
+  if (!sel) return;
   sel.innerHTML = pintNames.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
 }
 
 function populateLeaguePintName() {
   const sel = document.getElementById("leaguePintName");
+  if (!sel) return;
+
   sel.innerHTML = "<option value='all'>All Pints</option>" +
     pintNames.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
 
+  // also populate cheapest-pint dropdown
   const cheapestSel = document.getElementById("cheapestPintSelect");
-  cheapestSel.innerHTML = pintNames.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
+  if (cheapestSel) {
+    cheapestSel.innerHTML = pintNames.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
+  }
+}
+
+function populateDrinksMenuPubDropdown() {
+  const sel = document.getElementById("drinksMenuSelect");
+  if (!sel) return;
+  sel.innerHTML = pubs.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
 }
 
 /* ---------------------------------------------------
@@ -146,7 +156,7 @@ document.getElementById("addPintPriceBtn").onclick = async () => {
 };
 
 /* ---------------------------------------------------
-   COMPUTE PUB STATS (avg & trend)
+   COMPUTE PUB STATS (avg + trend)
 --------------------------------------------------- */
 function computePubStats() {
   pubs.forEach(pub => {
@@ -159,11 +169,15 @@ function computePubStats() {
     }
 
     const sorted = [...entries].sort((a,b)=>a.timestamp - b.timestamp);
-    pub.avg = sorted.reduce((a,b)=>a+b.price,0)/sorted.length;
+    pub.avg = sorted.reduce((a,b)=>a+b.price,0) / sorted.length;
 
-    pub.trend = sorted.length > 1
-      ? ((sorted[sorted.length-1].price - sorted[0].price)/sorted[0].price)*100
-      : 0;
+    if (sorted.length >= 2) {
+      const first = sorted[0].price;
+      const last = sorted[sorted.length-1].price;
+      pub.trend = ((last - first) / first) * 100;
+    } else {
+      pub.trend = 0;
+    }
   });
 }
 
@@ -184,7 +198,7 @@ function renderCheapestBanner() {
 }
 
 /* ---------------------------------------------------
-   MOST POPULAR PINT TODAY
+   MOST POPULAR TODAY
 --------------------------------------------------- */
 function renderPopularToday() {
   const out = document.getElementById("popularPintValue");
@@ -203,7 +217,7 @@ function renderPopularToday() {
 }
 
 /* ---------------------------------------------------
-   TOP PINT TYPES THIS WEEK
+   TOP TYPES THIS WEEK
 --------------------------------------------------- */
 function renderTopTypesThisWeek() {
   const out = document.getElementById("weeklyTypesValue");
@@ -216,7 +230,6 @@ function renderTopTypesThisWeek() {
 
   const types = ["Lager","Ale","IPA","Cider","Guinness"];
   const counts = {};
-
   types.forEach(t => counts[t] = 0);
   week.forEach(p => counts[p.pintType]++);
 
@@ -225,15 +238,11 @@ function renderTopTypesThisWeek() {
 }
 
 /* ---------------------------------------------------
-   MONEY INVESTED (weekly)
+   MONEY INVESTED THIS WEEK (for PINX card only)
 --------------------------------------------------- */
 function renderMoneyInvestedWeek() {
-  const out = document.getElementById("moneyInvestedValue");
-
   const week = prices.filter(p => Date.now() - p.timestamp < 7*86400000);
   const total = week.reduce((a,b)=>a+b.price,0);
-
-  out.innerText = `£${total.toFixed(2)}`;
 
   const inline = document.getElementById("moneyInvestedInline");
   if (inline) inline.innerText = `Money This Week: £${total.toFixed(2)}`;
@@ -258,7 +267,7 @@ function renderPINX() {
   if (previousPINX !== null) {
     if (pinx > previousPINX) arrow = " 🔺";
     else if (pinx < previousPINX) arrow = " 🔻";
-    else arrow = " ⏸️";
+    else arrow = " ➖";
   }
   previousPINX = pinx;
 
@@ -266,7 +275,7 @@ function renderPINX() {
 }
 
 /* ---------------------------------------------------
-   LIVE TICKER
+   TICKER
 --------------------------------------------------- */
 function renderTicker() {
   const t = document.getElementById("tickerText");
@@ -277,18 +286,15 @@ function renderTicker() {
 
   const items = [];
 
-  // cheapest
   const cheapest = [...prices].sort((a,b)=>a.price-b.price)[0];
   items.push(`Cheapest £${cheapest.price.toFixed(2)} (${cheapest.pintName})`);
 
-  // most active pub
   const counts = {};
   prices.forEach(p => counts[p.pubId] = (counts[p.pubId]||0)+1);
   const active = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
   const pubName = pubs.find(p=>p.id===active[0])?.name || "";
   items.push(`${pubName} active`);
 
-  // avg price
   const avg = prices.reduce((a,b)=>a+b.price,0)/prices.length;
   items.push(`Avg £${avg.toFixed(2)}`);
 
@@ -313,11 +319,11 @@ function renderCheapestByPintName() {
   const cheapest = relevant.sort((a,b)=>a.price - b.price)[0];
   const pub = pubs.find(p=>p.id===cheapest.pubId)?.name || "Unknown Pub";
 
-  out.innerText = `Cheapest ${pint} is £${cheapest.price.toFixed(2)} at ${pub}`;
+  out.innerText = `Cheapest ${pint}: £${cheapest.price.toFixed(2)} at ${pub}`;
 }
 
 /* ---------------------------------------------------
-   PUB LEAGUE (football style)
+   PUB LEAGUE TABLES (football style)
 --------------------------------------------------- */
 document.getElementById("showAllPubsBtn").onclick = () => {
   showAllLeague = !showAllLeague;
@@ -334,31 +340,26 @@ function renderLeague() {
 
   let list = pubs.filter(p => p.avg !== null);
 
-  // pint TYPE filter
   if (typeFilter !== "all") {
     list = list.filter(pub =>
       prices.some(pr => pr.pubId === pub.id && pr.pintType === typeFilter)
     );
   }
 
-  // pint NAME filter
   if (nameFilter !== "all") {
     list = list.filter(pub =>
       prices.some(pr => pr.pubId === pub.id && pr.pintName === nameFilter)
     );
   }
 
-  // Top 5 cheapest
   const cheap5 = [...list].sort((a,b)=>a.avg - b.avg).slice(0,5);
   document.getElementById("cheapestTable").innerHTML =
-    makeLeagueRows(cheap5);
+    makeLeagueRows(cheap5, true);
 
-  // Top 5 most expensive
   const exp5 = [...list].sort((a,b)=>b.avg - a.avg).slice(0,5);
   document.getElementById("expensiveTable").innerHTML =
-    makeLeagueRows(exp5);
+    makeLeagueRows(exp5, true);
 
-  // Full league (if expanded)
   if (showAllLeague) {
     const full = [...list].sort((a,b)=>a.avg - b.avg);
     document.getElementById("fullLeagueTable").innerHTML =
@@ -366,7 +367,6 @@ function renderLeague() {
   }
 }
 
-/* RENDER LEAGUE TABLE ROWS */
 function makeLeagueRows(list, includeHeader = false) {
   let html = "";
 
@@ -390,7 +390,72 @@ function makeLeagueRows(list, includeHeader = false) {
 }
 
 /* ---------------------------------------------------
-   RECENT FEED (5 most recent)
+   DRINKS MENU TABLE (per pub)
+--------------------------------------------------- */
+document.getElementById("drinksMenuSelect").onchange = renderDrinksMenu;
+
+function renderDrinksMenu() {
+  const pubId = document.getElementById("drinksMenuSelect").value;
+  const table = document.getElementById("drinksMenuTable");
+  if (!pubId || !table) return;
+
+  const entries = prices.filter(p => p.pubId === pubId);
+
+  if (!entries.length) {
+    table.innerHTML = "<tr><td>No drinks recorded</td></tr>";
+    return;
+  }
+
+  const groups = {};
+  entries.forEach(p => {
+    if (!groups[p.pintName]) groups[p.pintName] = [];
+    groups[p.pintName].push(p);
+  });
+
+  const rows = Object.keys(groups)
+    .sort((a,b)=>a.localeCompare(b))  // alphabetical sorting
+    .map(name => buildDrinksMenuRow(name, groups[name]))
+    .join("");
+
+  table.innerHTML = `
+    <tr>
+      <th>Pint</th>
+      <th>Type</th>
+      <th>Cheapest</th>
+      <th>Average</th>
+      <th>Trend</th>
+    </tr>
+    ${rows}
+  `;
+}
+
+function buildDrinksMenuRow(name, items) {
+  const cheapest = Math.min(...items.map(i => i.price));
+  const avg = items.reduce((a,b)=>a+b.price,0) / items.length;
+
+  const sorted = [...items].sort((a,b)=>a.timestamp - b.timestamp);
+  const first = sorted[0].price;
+  const last = sorted[sorted.length-1].price;
+
+  let trend = "➖";
+  if (last > first) trend = "📈";
+  else if (last < first) trend = "📉";
+
+  const type = items[0].pintType || "—";
+
+  return `
+    <tr>
+      <td>${name}</td>
+      <td>${type}</td>
+      <td>£${cheapest.toFixed(2)}</td>
+      <td>£${avg.toFixed(2)}</td>
+      <td>${trend}</td>
+    </tr>
+  `;
+}
+
+/* ---------------------------------------------------
+   RECENT FEED (latest 5 only)
 --------------------------------------------------- */
 function renderRecent() {
   const out = document.getElementById("recentFeed");
@@ -406,44 +471,57 @@ function renderRecent() {
 }
 
 /* ---------------------------------------------------
-   BUDGET HELPER
+   BUDGET PLANNER V2
 --------------------------------------------------- */
-function renderBudget() {
-  const out = document.getElementById("budgetOutput");
+document.getElementById("runBudgetBtn").onclick = runBudgetPlanner;
 
-  if (!userBudget || !userMax) {
-    out.innerText = "Set your budget above.";
+function runBudgetPlanner() {
+  const budget = parseFloat(document.getElementById("budgetInput").value);
+  const max = parseFloat(document.getElementById("budgetMaxInput").value);
+  const out = document.getElementById("budgetResult");
+
+  if (!budget || !max) {
+    out.innerText = "Please enter both budget and max price per pint.";
     return;
   }
 
-  const b = parseFloat(userBudget);
-  const m = parseFloat(userMax);
-  const pints = Math.floor(b/m);
+  const eligiblePubs = pubs
+    .map(pub => {
+      const pintEntries = prices.filter(p => p.pubId === pub.id && p.price <= max);
+      if (!pintEntries.length) return null;
+
+      const cheapest = Math.min(...pintEntries.map(e => e.price));
+      const pints = Math.floor(budget / cheapest);
+
+      return {
+        pub,
+        cheapest,
+        pints,
+        affordable: pintEntries
+      };
+    })
+    .filter(x => x !== null && x.pints > 0);
+
+  if (!eligiblePubs.length) {
+    out.innerText = "No pubs fit your budget and max pint price.";
+    return;
+  }
+
+  const best = eligiblePubs.sort((a,b)=>b.pints - a.pints)[0];
+
+  const pintNamesAvailable = [...new Set(
+    best.affordable.map(e => `${e.pintName} (£${e.price.toFixed(2)})`)
+  )];
 
   out.innerHTML = `
-    You can buy <strong>${pints}</strong> pints at £${m}.<br><br>
+    <strong>Best pub for your budget:</strong><br>
+    🏆 ${best.pub.name}<br>
+    Cheapest pint: £${best.cheapest.toFixed(2)}<br>
+    You can buy <strong>${best.pints}</strong> pints<br><br>
+    <strong>Affordable pints here:</strong><br>
+    ${pintNamesAvailable.join("<br>")}
   `;
-
-  const affordable = pubs.filter(pub => pub.avg && pub.avg <= m);
-
-  if (affordable.length) {
-    out.innerHTML += `<strong>Affordable pubs:</strong><br>`;
-    out.innerHTML += affordable
-      .map(p => `${p.name} (£${p.avg.toFixed(2)})`)
-      .join("<br>");
-  } else {
-    out.innerHTML += "No pubs fit your budget.";
-  }
 }
-
-document.getElementById("saveBudgetBtn").onclick = () => {
-  userBudget = document.getElementById("budgetInput").value;
-  userMax = document.getElementById("budgetMaxInput").value;
-  localStorage.setItem("budget", userBudget);
-  localStorage.setItem("maxprice", userMax);
-  renderBudget();
-  showToast("Budget saved!");
-};
 
 /* ---------------------------------------------------
    TOASTS
