@@ -1,44 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Westminster Pints Test</title>
+  <meta charset="UTF-8">
+  <title>Westminster Pints Exchange</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <h1>Testing Firebase...</h1>
 
-  <div id="output">Loading...</div>
+  <h1>Westminster Pints Exchange</h1>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { 
-      getFirestore, collection, getDocs 
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- PINX Index -->
+  <section id="pinxSection">
+    <h2>PINX Index</h2>
+    <div id="pinxValue">Loading...</div>
+  </section>
 
-    // Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBHUGgt8F4OQJjdx11qOMPC0iRJGFZmU8E",
-      authDomain: "westminsterpints.firebaseapp.com",
-      projectId: "westminsterpints",
-      storageBucket: "westminsterpints.appspot.com",
-      messagingSenderId: "913960848966",
-      appId: "1:913960848966:web:df6355a6b5b25dbdc5c447",
-      measurementId: "G-E9SNYKYEBN"
-    };
+  <!-- Cheapest Pint -->
+  <section id="cheapestSection">
+    <h2>Cheapest Pint Right Now</h2>
+    <div id="cheapestValue">Loading...</div>
+  </section>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- Add Pub -->
+  <section id="addPubSection">
+    <h2>Add Pub</h2>
+    <input id="pubNameInput" placeholder="Pub name">
+    <select id="pubCategoryInput">
+      <option value="Westminster">Westminster</option>
+    </select>
+    <button id="addPubBtn">Add Pub</button>
+  </section>
 
-    // Test: get all pubs
-    const querySnapshot = await getDocs(collection(db, "pubs"));
-    
-    let text = "";
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      text += `<p>${doc.id}: ${JSON.stringify(data)}</p>`;
-    });
+  <!-- Add Pint -->
+  <section id="addPintSection">
+    <h2>Add Pint Price</h2>
+    <select id="pintPubSelect"></select>
+    <select id="pintTypeSelect">
+      <option value="Lager">Lager</option>
+      <option value="Ale">Ale</option>
+      <option value="IPA">IPA</option>
+      <option value="Guinness">Guinness</option>
+      <option value="Cider">Cider</option>
+    </select>
+    <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
+    <button id="addPintBtn">Add Pint Price</button>
+  </section>
 
-    document.getElementById("output").innerHTML = text || "No pubs found.";
-  </script>
+  <!-- League Table -->
+  <section id="leagueSection">
+    <h2>League Table</h2>
+    <select id="leagueMode">
+      <option value="cheapest">Cheapest Pubs</option>
+      <option value="drops">Biggest Price Drops</option>
+      <option value="rises">Biggest Price Rises</option>
+      <option value="volatile">Most Volatile</option>
+    </select>
+
+    <table id="leagueTable">
+      <thead>
+        <tr>
+          <th>Pub</th>
+          <th>Avg Price</th>
+          <th>24h %</th>
+          <th>Sparkline</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Good Investments -->
+  <section id="goodInvestmentsSection">
+    <h2>Good Investments (Pubs)</h2>
+    <div id="goodInvestments"></div>
+  </section>
+
+  <!-- Full Pub List -->
+  <section id="pubListSection">
+    <h2>All Pubs</h2>
+    <div id="pubList"></div>
+  </section>
+
+  <!-- Admin mode -->
+  <div id="adminToggle">Admin: OFF</div>
+  <section id="adminPanel" style="display:none;">
+    <h2>Admin Panel</h2>
+    <div id="adminContent"></div>
+  </section>
+
+  <script type="module" src="app.js"></script>
 
 </body>
 </html>
