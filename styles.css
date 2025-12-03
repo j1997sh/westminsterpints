@@ -1,6 +1,6 @@
-/* -----------------------------------------------
-   GLOBAL COLOURS — Westminster Blue Theme
------------------------------------------------ */
+/* ---------------------------------------------------
+   GLOBAL THEME — Westminster Blue
+--------------------------------------------------- */
 :root {
   --blue: #0057B8;
   --blue-dark: #003A73;
@@ -11,20 +11,42 @@
   --text-dark: #1C1C1E;
 }
 
-/* -----------------------------------------------
+/* ---------------------------------------------------
    BODY
------------------------------------------------ */
+--------------------------------------------------- */
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
   background: var(--bg);
   color: var(--text-dark);
-  padding-bottom: 90px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 90px; /* space for bottom-nav */
 }
 
-/* -----------------------------------------------
-   DESKTOP NAV 
------------------------------------------------ */
+/* ---------------------------------------------------
+   HEADER
+--------------------------------------------------- */
+.top-header {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: white;
+  text-align: center;
+  padding: 20px 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.top-header h1 {
+  font-size: 26px;
+  margin: 0;
+}
+.subtitle {
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+/* ---------------------------------------------------
+   DESKTOP NAV (hidden on mobile)
+--------------------------------------------------- */
 .top-nav-desktop {
   display: none;
   background: var(--blue);
@@ -44,65 +66,51 @@ body {
   border-radius: 8px;
 }
 
-/* -----------------------------------------------
-   HEADER
------------------------------------------------ */
-.top-header {
-  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-  color: white;
-  text-align: center;
-  padding: 28px 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.subtitle {
-  margin-top: 6px;
-  opacity: 0.85;
-}
-
-/* -----------------------------------------------
+/* ---------------------------------------------------
    CARDS
------------------------------------------------ */
+--------------------------------------------------- */
 .card {
   background: white;
-  width: 92%;
-  margin: 20px auto;
+  width: 94%;
+  max-width: 500px;
+  margin: 18px auto;
   padding: 22px;
   border-radius: 16px;
   box-shadow:
     0 4px 14px rgba(0,0,0,0.06),
     0 0 0 1px rgba(0,0,0,0.04);
-  animation: fadeUp 0.4s ease;
+  animation: fadeUp 0.35s ease;
 }
 
 .card.highlight {
   border-left: 6px solid var(--blue);
 }
 
-/* Two-column layout on desktop */
-@media (min-width: 900px) {
+/* Desktop: 2-column layout */
+@media (min-width: 1100px) {
   .card {
     width: 45%;
     display: inline-block;
     margin: 14px 2%;
     vertical-align: top;
   }
-
   .card.full-width {
     width: 94%;
+    max-width: none;
   }
 }
 
-/* -----------------------------------------------
-   INPUTS
------------------------------------------------ */
+/* ---------------------------------------------------
+   INPUTS & BUTTONS
+--------------------------------------------------- */
 input, select, button {
   padding: 12px;
   margin: 6px 3px;
   border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 15px;
+  width: 100%;
 }
-
 button {
   background: var(--blue);
   color: white;
@@ -114,38 +122,49 @@ button:hover {
   background: var(--blue-dark);
 }
 
-/* -----------------------------------------------
+/* Desktop input adjustments */
+@media (min-width: 1100px) {
+  input, select {
+    width: 100%;
+  }
+}
+
+/* ---------------------------------------------------
    TYPOGRAPHY
------------------------------------------------ */
+--------------------------------------------------- */
 h2 {
-  font-size: 22px;
+  font-size: 20px;
   margin-top: 0;
 }
 .metric {
-  font-size: 32px;
-  font-weight: 700;
-}
-.top-metric {
   font-size: 28px;
   font-weight: 700;
 }
-
-/* Desktop compact typography */
-@media (min-width: 900px) {
-  h2 { font-size: 18px; }
-  .card { padding: 16px 20px; }
-  .metric { font-size: 26px; }
-  .top-metric { font-size: 24px; }
+.top-metric {
+  font-size: 26px;
+  font-weight: 700;
 }
 
-/* -----------------------------------------------
-   PUB TILES - Modern Cards
------------------------------------------------ */
+@media (min-width: 1100px) {
+  h2 { font-size: 18px; }
+  .metric { font-size: 24px; }
+  .top-metric { font-size: 22px; }
+}
+
+/* ---------------------------------------------------
+   PUB TILES GRID
+--------------------------------------------------- */
 .pub-tiles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 12px;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+/* Desktop: multi-column */
+@media (min-width: 1100px) {
+  .pub-tiles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
 }
 
 .pub-tile {
@@ -182,30 +201,122 @@ h2 {
   margin-top: 10px;
 }
 
-/* -----------------------------------------------
-   TICKER TAPE
------------------------------------------------ */
-.ticker-wrapper {
-  background: var(--blue-dark);
+/* ---------------------------------------------------
+   POLLING INTENT
+--------------------------------------------------- */
+#pollingBars {
+  margin-top: 10px;
+}
+.poll-bar {
+  background: #ddd;
+  border-radius: 6px;
+  margin: 8px 0;
+  position: relative;
+}
+.poll-fill {
+  height: 22px;
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+.poll-type-label {
+  position: absolute;
+  left: 8px;
+  top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.poll-percent {
+  position: absolute;
+  right: 8px;
+  top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.polling-leader {
+  margin-top: 10px;
+  font-style: italic;
+  color: var(--blue-dark);
+}
+
+/* ---------------------------------------------------
+   MINI STATS
+--------------------------------------------------- */
+#miniStatsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mini-stat {
+  background: var(--bg);
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+@media (min-width: 1100px) {
+  #miniStatsContent {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .mini-stat {
+    flex: 1;
+    margin: 0 6px;
+  }
+}
+
+/* ---------------------------------------------------
+   RECENT SUBMISSIONS FEED
+--------------------------------------------------- */
+#recentFeedContent {
+  font-size: 15px;
+  line-height: 1.45;
+}
+.feed-entry {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* ---------------------------------------------------
+   FLASH TOAST
+--------------------------------------------------- */
+.flash-toast {
+  position: fixed;
+  bottom: 110px;
+  right: 20px;
+  background: var(--blue);
   color: white;
-  overflow: hidden;
-  padding: 6px 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+  z-index: 500;
+}
+.flash-toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.ticker {
-  white-space: nowrap;
-  display: inline-block;
-  padding-left: 100%;
-  animation: tickerMove 20s linear infinite;
-}
-@keyframes tickerMove {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+/* ---------------------------------------------------
+   ADMIN TOGGLE
+--------------------------------------------------- */
+#adminToggle {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--blue);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  z-index: 300;
 }
 
-/* -----------------------------------------------
-   BOTTOM NAV (MOBILE)
------------------------------------------------ */
+/* ---------------------------------------------------
+   BOTTOM NAV
+--------------------------------------------------- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -226,36 +337,20 @@ h2 {
   font-size: 14px;
   color: var(--blue);
 }
+.nav-item div {
+  font-size: 11px;
+  margin-top: 2px;
+}
 
 /* Hide mobile nav on desktop */
-@media (min-width: 900px) {
-  .bottom-nav {
-    display: none;
-  }
-  .top-nav-desktop {
-    display: flex;
-  }
+@media (min-width: 1100px) {
+  .bottom-nav { display: none; }
+  .top-nav-desktop { display: flex; }
 }
 
-/* -----------------------------------------------
-   ADMIN POPUP
------------------------------------------------ */
-#adminToggle {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  background: var(--blue);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 500;
-  z-index: 300;
-}
-
-/* -----------------------------------------------
+/* ---------------------------------------------------
    ANIMATIONS
------------------------------------------------ */
+--------------------------------------------------- */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
