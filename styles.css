@@ -1,82 +1,179 @@
+/* -----------------------------------------------
+   GLOBAL COLOURS — Westminster Blue Theme
+----------------------------------------------- */
+:root {
+  --blue: #0057B8;
+  --blue-dark: #003A73;
+  --gold: #FFD55A;
+  --green: #00A676;
+  --red: #D7263D;
+  --bg: #F4F5F7;
+  --text-dark: #1C1C1E;
+}
+
+/* -----------------------------------------------
+   BODY
+----------------------------------------------- */
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
+  background: var(--bg);
+  color: var(--text-dark);
   padding-bottom: 90px;
-  background: #f5f5f5;
-  color: #222;
 }
 
-/* HEADER */
+/* -----------------------------------------------
+   DESKTOP NAV 
+----------------------------------------------- */
+.top-nav-desktop {
+  display: none;
+  background: var(--blue);
+  color: white;
+  padding: 10px 20px;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+.top-nav-desktop div {
+  cursor: pointer;
+  padding: 6px 12px;
+}
+.top-nav-desktop div:hover {
+  background: var(--blue-dark);
+  border-radius: 8px;
+}
+
+/* -----------------------------------------------
+   HEADER
+----------------------------------------------- */
 .top-header {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: white;
   text-align: center;
-  background: white;
-  padding: 20px 10px;
-  border-bottom: 2px solid #eee;
+  padding: 28px 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
 .subtitle {
-  color: #777;
-  margin-top: 0;
+  margin-top: 6px;
+  opacity: 0.85;
 }
 
-/* CARDS */
+/* -----------------------------------------------
+   CARDS
+----------------------------------------------- */
 .card {
   background: white;
   width: 92%;
-  max-width: 760px;
   margin: 20px auto;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.06),
+    0 0 0 1px rgba(0,0,0,0.04);
+  animation: fadeUp 0.4s ease;
 }
 
 .card.highlight {
-  border-left: 6px solid #0077cc;
+  border-left: 6px solid var(--blue);
 }
 
-.metric, .top-metric {
-  font-size: 26px;
-  font-weight: bold;
+/* Two-column layout on desktop */
+@media (min-width: 900px) {
+  .card {
+    width: 45%;
+    display: inline-block;
+    margin: 14px 2%;
+    vertical-align: top;
+  }
+
+  .card.full-width {
+    width: 94%;
+  }
 }
 
-/* INPUTS */
+/* -----------------------------------------------
+   INPUTS
+----------------------------------------------- */
 input, select, button {
-  padding: 10px;
+  padding: 12px;
   margin: 6px 3px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ccc;
+  font-size: 15px;
 }
 
 button {
-  background: #0077cc;
+  background: var(--blue);
   color: white;
   border: none;
   cursor: pointer;
+  font-weight: 600;
 }
 button:hover {
-  background: #005fa3;
+  background: var(--blue-dark);
 }
 
-/* PUB TILES */
+/* -----------------------------------------------
+   TYPOGRAPHY
+----------------------------------------------- */
+h2 {
+  font-size: 22px;
+  margin-top: 0;
+}
+.metric {
+  font-size: 32px;
+  font-weight: 700;
+}
+.top-metric {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* Desktop compact typography */
+@media (min-width: 900px) {
+  h2 { font-size: 18px; }
+  .card { padding: 16px 20px; }
+  .metric { font-size: 26px; }
+  .top-metric { font-size: 24px; }
+}
+
+/* -----------------------------------------------
+   PUB TILES - Modern Cards
+----------------------------------------------- */
+.pub-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
 .pub-tile {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 14px;
-  border-radius: 10px;
-  margin: 10px 0;
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.05),
+    0 0 0 1px rgba(0,0,0,0.04);
   cursor: pointer;
+  transition: 0.15s ease;
+  border-left: 6px solid #ddd;
+}
+.pub-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.10);
 }
 
 .pub-header {
   display: flex;
   justify-content: space-between;
+  font-weight: 600;
   font-size: 18px;
-  font-weight: bold;
 }
-
 .pub-badges {
-  font-size: 14px;
   margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.9;
 }
 
 .spark {
@@ -85,46 +182,13 @@ button:hover {
   margin-top: 10px;
 }
 
-/* ADMIN TOGGLE */
-#adminToggle {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  background: black;
-  padding: 12px 14px;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  z-index: 300;
-}
-
-/* BOTTOM NAV */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 75px;
-  background: #fff;
-  border-top: 2px solid #eee;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 200;
-}
-
-.nav-item {
-  text-align: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* TICKER */
+/* -----------------------------------------------
+   TICKER TAPE
+----------------------------------------------- */
 .ticker-wrapper {
-  width: 100%;
+  background: var(--blue-dark);
+  color: white;
   overflow: hidden;
-  background: #000;
-  color: #fff;
   padding: 6px 0;
 }
 
@@ -133,10 +197,66 @@ button:hover {
   display: inline-block;
   padding-left: 100%;
   animation: tickerMove 20s linear infinite;
-  font-size: 14px;
 }
-
 @keyframes tickerMove {
   0% { transform: translateX(0); }
   100% { transform: translateX(-100%); }
+}
+
+/* -----------------------------------------------
+   BOTTOM NAV (MOBILE)
+----------------------------------------------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 75px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 200;
+}
+
+.nav-item {
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--blue);
+}
+
+/* Hide mobile nav on desktop */
+@media (min-width: 900px) {
+  .bottom-nav {
+    display: none;
+  }
+  .top-nav-desktop {
+    display: flex;
+  }
+}
+
+/* -----------------------------------------------
+   ADMIN POPUP
+----------------------------------------------- */
+#adminToggle {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--blue);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  z-index: 300;
+}
+
+/* -----------------------------------------------
+   ANIMATIONS
+----------------------------------------------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
