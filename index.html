@@ -8,28 +8,39 @@
 
 <body>
 
-  <!-- DESKTOP NAV (hidden on mobile) -->
+  <!-- DESKTOP NAV -->
   <nav class="top-nav-desktop">
+    <div onclick="scrollToSection('budgetHelper')">👛 Budget</div>
+    <div onclick="scrollToSection('pollingIntent')">🗳️ Polling</div>
     <div onclick="scrollToSection('addPintCard')">🍺 Add Pint</div>
-    <div onclick="scrollToSection('pubTiles')">📊 League</div>
-    <div onclick="scrollToSection('goodInvestments')">💡 Investments</div>
-    <div onclick="scrollToSection('marketMovers')">📉📈 Movers</div>
-    <div onclick="scrollToSection('mostActive')">🔥 Most Active</div>
+    <div onclick="scrollToSection('pubLeague')">📊 League</div>
+    <div onclick="scrollToSection('recentFeed')">📰 Feed</div>
   </nav>
 
   <!-- HEADER -->
   <header class="top-header">
     <h1>🍻 Westminster Pints Exchange</h1>
-    <p class="subtitle">Real-time pint prices in the heart of Westminster</p>
+    <p class="subtitle">Real-time pint prices across the Westminster Village</p>
   </header>
 
-  <!-- CHEAPEST PINT -->
+  <!-- BUDGET HELPER -->
+  <section class="card highlight" id="budgetHelper">
+    <h2>👛 Pint Budget Helper</h2>
+    <label>Your Daily Budget:</label>
+    <input type="number" id="budgetInput" placeholder="£ (e.g. 15)">
+    <label>Maximum Price Per Pint:</label>
+    <input type="number" id="maxPriceInput" placeholder="£ (e.g. 6)">
+    <button id="saveBudgetBtn">Save Budget Settings</button>
+    <div id="budgetResults" class="budget-output"></div>
+  </section>
+
+  <!-- CHEAPEST PINT TOP BANNER -->
   <section class="card highlight">
     <h2>🏆 Cheapest Pint Right Now</h2>
     <div id="cheapestTop" class="top-metric">Loading...</div>
   </section>
 
-  <!-- PINX -->
+  <!-- PINX INDEX -->
   <section class="card">
     <h2>📈 PINX Index</h2>
     <div id="pinxValue" class="metric">Loading...</div>
@@ -56,16 +67,28 @@
   <section class="card">
     <h2>➕ Add Pub</h2>
     <input id="pubNameInput" placeholder="Pub name">
-    <select id="pubCategoryInput">
-      <option value="Westminster">Westminster</option>
-    </select>
     <button id="addPubBtn">Add Pub 🏛️</button>
   </section>
 
-  <!-- FILTER -->
-  <section class="card">
-    <h2>🔎 Filter by Pint Type</h2>
-    <select id="filterType">
+  <!-- POLLING INTENT -->
+  <section class="card" id="pollingIntent">
+    <h2>🗳️ Pint Polling Intent Meter</h2>
+    <div id="pollingBars"></div>
+    <div id="pollingLeader" class="polling-leader"></div>
+  </section>
+
+  <!-- MINI STATS -->
+  <section class="card" id="miniStats">
+    <h2>📊 Market Mini-Stats</h2>
+    <div id="miniStatsContent"></div>
+  </section>
+
+  <!-- PUB LEAGUE -->
+  <section class="card full-width" id="pubLeague">
+    <h2>📊 Pub League</h2>
+
+    <label>Filter League by Pint Type:</label>
+    <select id="leagueFilter">
       <option value="all">All Types</option>
       <option value="Lager">Lager</option>
       <option value="Ale">Ale</option>
@@ -73,28 +96,6 @@
       <option value="Guinness">Guinness</option>
       <option value="Cider">Cider</option>
     </select>
-  </section>
-
-  <!-- TICKER -->
-  <section class="ticker-wrapper">
-    <div id="tickerTape" class="ticker"></div>
-  </section>
-
-  <!-- DAILY MOVERS -->
-  <section class="card" id="marketMovers">
-    <h2>📉📈 Daily Market Movers</h2>
-    <div id="marketMoversContent"></div>
-  </section>
-
-  <!-- MOST ACTIVE PUBS -->
-  <section class="card" id="mostActive">
-    <h2>🔥 Most Active Pubs Today</h2>
-    <div id="mostActiveContent"></div>
-  </section>
-
-  <!-- PUB LEAGUE -->
-  <section class="card full-width">
-    <h2>📊 Pub League</h2>
 
     <select id="leagueMode">
       <option value="cheapest">Cheapest</option>
@@ -105,6 +106,12 @@
     <div id="pubTiles" class="pub-tiles-grid"></div>
   </section>
 
+  <!-- RECENT SUBMISSIONS FEED -->
+  <section class="card" id="recentFeed">
+    <h2>📰 Recent Submissions</h2>
+    <div id="recentFeedContent"></div>
+  </section>
+
   <!-- GOOD INVESTMENTS -->
   <section class="card">
     <h2>💡 Good Investments</h2>
@@ -113,19 +120,21 @@
 
   <!-- ADMIN -->
   <div id="adminToggle">⚙️ Admin: OFF</div>
-
   <section id="adminPanel" class="card" style="display:none;">
     <h2>🛠️ Admin Panel</h2>
     <div id="adminContent"></div>
   </section>
 
-  <!-- MOBILE BOTTOM NAV -->
+  <!-- FLASH TOAST -->
+  <div id="flashToast" class="flash-toast"></div>
+
+  <!-- MOBILE NAV -->
   <nav class="bottom-nav">
+    <div class="nav-item" onclick="scrollToSection('budgetHelper')">👛<div>Budget</div></div>
+    <div class="nav-item" onclick="scrollToSection('pollingIntent')">🗳️<div>Polls</div></div>
     <div class="nav-item" onclick="scrollToSection('addPintCard')">🍺<div>Add</div></div>
-    <div class="nav-item" onclick="scrollToSection('pubTiles')">📊<div>League</div></div>
-    <div class="nav-item" onclick="scrollToSection('marketMovers')">📉<div>Movers</div></div>
-    <div class="nav-item" onclick="scrollToSection('mostActive')">🔥<div>Active</div></div>
-    <div class="nav-item" onclick="scrollToSection('adminToggle')">⚙️<div>Admin</div></div>
+    <div class="nav-item" onclick="scrollToSection('pubLeague')">📊<div>League</div></div>
+    <div class="nav-item" onclick="scrollToSection('recentFeed')">📰<div>Feed</div></div>
   </nav>
 
   <script type="module" src="app.js"></script>
