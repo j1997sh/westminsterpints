@@ -1,358 +1,229 @@
 /* ---------------------------------------------------
-   BASE
+   RESET & BASE
 --------------------------------------------------- */
-:root {
-  --blue: #0057B8;
-  --blue-dark: #003A73;
-  --yellow: #FFE885;
-  --bg: #F5F6FA;
-  --text: #1c1c1e;
-  --text-light: #666;
-  --card-bg: #fff;
-  --shadow: 0 3px 12px rgba(0,0,0,0.08);
-  --green: #d8f5d2;
-  --red: #ffe0e0;
-  --grey: #f2f2f2;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  font-family: system-ui, sans-serif;
-  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f7f8fa;
+  color: #1d1d1f;
   overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
+/* ---------------------------------------------------
+   GLOBAL SPACING
+--------------------------------------------------- */
+body {
+  padding-bottom: 90px; /* space for mobile nav */
 }
 
 /* ---------------------------------------------------
    HEADER
 --------------------------------------------------- */
 .top-header {
-  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-  color: white;
+  background: linear-gradient(135deg, #0057b8, #003a75);
+  padding: 28px 16px;
   text-align: center;
-  padding: 20px 10px;
-  box-shadow: var(--shadow);
+  color: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
 }
 
 .top-header h1 {
-  margin: 0;
   font-size: 1.7rem;
+  font-weight: 700;
 }
 
 .subtitle {
-  margin: 5px 0 0;
-  opacity: 0.85;
+  opacity: 0.9;
   font-size: 0.95rem;
-}
-
-/* ---------------------------------------------------
-   CHEAPEST BANNER
---------------------------------------------------- */
-.cheapest-banner {
-  background: var(--yellow);
-  padding: 14px 10px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  border-bottom: 2px solid #e6d370;
-}
-
-/* ---------------------------------------------------
-   METRIC CARDS
---------------------------------------------------- */
-.metric-row {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  flex-wrap: wrap;
-}
-
-.metric-card {
-  background: var(--card-bg);
-  flex: 1;
-  min-width: 150px;
-  padding: 14px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  text-align: center;
-}
-
-.metric-card h3 {
-  margin: 0 0 8px;
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-
-.metric-small {
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-
-/* ---------------------------------------------------
-   TICKER
---------------------------------------------------- */
-.ticker {
-  overflow: hidden;
-  white-space: nowrap;
-  background: #fff;
-  padding: 10px 0;
-  box-shadow: inset 0 -1px 4px rgba(0,0,0,0.08);
-}
-
-#tickerText {
-  display: inline-block;
-  padding-left: 100%;
-  animation: tickerMove 18s linear infinite;
-  font-size: 0.95rem;
-}
-
-@keyframes tickerMove {
-  from { transform: translateX(0%); }
-  to   { transform: translateX(-100%); }
-}
-
-/* ---------------------------------------------------
-   MAIN CONTENT
---------------------------------------------------- */
-.content {
-  padding: 12px;
 }
 
 /* ---------------------------------------------------
    CARDS
 --------------------------------------------------- */
 .card {
-  background: var(--card-bg);
-  padding: 16px;
+  background: #fff;
   border-radius: 14px;
-  box-shadow: var(--shadow);
-  margin-bottom: 14px;
+  margin: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
 .card h2 {
-  margin-top: 0;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------
-   FORM ELEMENTS
+   CHEAPEST BANNER
 --------------------------------------------------- */
-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-top: 8px;
-  display: block;
+.cheapest-banner {
+  background: #fff4b8;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 16px;
+  border-radius: 0;
 }
 
+/* ---------------------------------------------------
+   METRIC ROW
+--------------------------------------------------- */
+.metric-row {
+  display: flex;
+  gap: 16px;
+  margin: 16px;
+  flex-direction: column;
+}
+
+.metric-row > div {
+  flex: 1;
+  padding: 16px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+.metric-row h3 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  opacity: 0.75;
+}
+
+.metric-row div > div {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------
+   INPUTS
+--------------------------------------------------- */
 input, select, button {
   width: 100%;
-  padding: 11px;
-  margin-top: 6px;
-  font-size: 0.95rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-button {
-  background: var(--blue);
-  color: white;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button:hover {
-  background: var(--blue-dark);
-}
-
-/* ---------------------------------------------------
-   TWO COLUMN LAYOUT
---------------------------------------------------- */
-.columns {
-  display: block;
-}
-
-@media (min-width: 900px) {
-  .columns {
-    display: flex;
-    gap: 20px;
-  }
-
-  .col-left, .col-right {
-    flex: 1;
-  }
-}
-
-/* ---------------------------------------------------
-   TABLES (League + Drinks + Swing)
---------------------------------------------------- */
-.league-table,
-.drinks-table,
-.swing-table {
-  width: 100%;
-  border-collapse: collapse;
+  padding: 14px;
   margin-top: 10px;
-}
-
-.league-table th,
-.drinks-table th,
-.swing-table th {
-  background: var(--grey);
-  padding: 8px;
-  text-align: left;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #ddd;
-}
-
-.league-table td,
-.drinks-table td,
-.swing-table td {
-  padding: 8px;
-  font-size: 0.95rem;
-  border-bottom: 1px solid #eee;
-}
-
-.league-table tr:nth-child(even),
-.drinks-table tr:nth-child(even),
-.swing-table tr:nth-child(even) {
+  font-size: 1rem;
+  border-radius: 12px;
+  border: 1px solid #d3d3d3;
   background: #fafafa;
 }
 
-.swing-positive {
-  background: #e8fbe6 !important;
+button {
+  background: #0057b8;
+  color: white;
+  font-weight: 700;
+  border: none;
+  transition: 0.2s;
 }
 
-.swing-negative {
-  background: #ffeaea !important;
+button:hover {
+  background: #003f8a;
 }
 
 /* ---------------------------------------------------
-   CLUSTER DETECTOR
+   TABLES
 --------------------------------------------------- */
-#clusterContent {
-  margin-top: 10px;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+table th {
+  background: #f0f2f5;
+  padding: 12px;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #ececec;
   font-size: 0.95rem;
 }
 
-.cluster-group {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: #f9f9f9;
+/* ---------------------------------------------------
+   ANALYTICS BLOCKS
+--------------------------------------------------- */
+.cluster-block,
+.menu-block {
+  background: #fafafa;
+  padding: 14px;
+  margin-top: 10px;
   border-radius: 12px;
 }
 
-.cluster-group h3 {
-  margin: 0 0 6px;
+.cluster-block h3 {
+  margin-bottom: 6px;
 }
 
 /* ---------------------------------------------------
-   RARITY LIST
---------------------------------------------------- */
-.rarity-list {
-  padding-left: 18px;
-  font-size: 1rem;
-}
-
-.rarity-list li {
-  margin: 6px 0;
-}
-
-/* ---------------------------------------------------
-   MODAL POPUP
---------------------------------------------------- */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  overflow-y: auto;
-}
-
-.modal-content {
-  background: #fff;
-  margin: 50px auto;
-  padding: 20px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 420px;
-  box-shadow: var(--shadow);
-}
-
-.modal-close {
-  float: right;
-  font-size: 1.6rem;
-  cursor: pointer;
-}
-
-/* ---------------------------------------------------
-   RECENT FEED
---------------------------------------------------- */
-#recentFeed .feed-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
-  font-size: 0.95rem;
-}
-
-/* ---------------------------------------------------
-   BOTTOM NAV (5 ICONS)
+   MOBILE NAV
 --------------------------------------------------- */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 68px;
-  background: rgba(255,255,255,0.97);
-  border-top: 1px solid #ccc;
+  height: 70px;
+  background: #fff;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999;
 }
 
-.nav-item {
-  text-align: center;
-  font-size: 1.25rem;
-  width: 20%;
-}
-
-.nav-item div {
-  font-size: 0.65rem;
-  margin-top: 2px;
-}
-
-@media (min-width: 900px) {
-  .bottom-nav {
-    display: none;
-  }
+.bottom-nav button {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: none;
+  font-size: 1.6rem;
 }
 
 /* ---------------------------------------------------
-   TOAST
+   MODAL
 --------------------------------------------------- */
-.toast {
+.modal {
   position: fixed;
-  bottom: 90px;
-  right: 16px;
-  background: var(--blue);
-  color: white;
-  padding: 14px;
-  border-radius: 12px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 0.3s ease;
-  z-index: 2000;
+  top: 0;
+  left: 0;
+  right:0;
+  bottom:0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
+.modal-content {
+  background: white;
+  padding: 20px;
+  width: 85%;
+  max-width: 400px;
+  border-radius: 14px;
+}
+
+/* ---------------------------------------------------
+   FEED ITEMS
+--------------------------------------------------- */
+.feed-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* ---------------------------------------------------
+   RESPONSIVE TWEAKS
+--------------------------------------------------- */
+@media (min-width: 720px) {
+  .metric-row {
+    flex-direction: row;
+  }
 }
