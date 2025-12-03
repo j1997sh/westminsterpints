@@ -31,28 +31,26 @@ let admin = false;
 let filterType = "all"; // Pint type filter: all / Lager / Ale / IPA / Guinness / Cider
 
 /* ---------------------------------------------------
-   FIRESTORE LIVE LISTENERS
+   LIVE FIRESTORE LISTENERS
 --------------------------------------------------- */
-onSnapshot(collection(db, "pubs"), snap => {
-  pubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+onSnapshot(collection(db, "pubs"), snapshot => {
+  pubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   refreshUI();
 });
 
-onSnapshot(collection(db, "prices"), snap => {
-  prices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+onSnapshot(collection(db, "prices"), snapshot => {
+  prices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   refreshUI();
 });
 
 /* ---------------------------------------------------
-   EVENT HANDLERS
+   ADD PUB
 --------------------------------------------------- */
-
-// Add pub
 document.getElementById("addPubBtn").onclick = async () => {
   const name = document.getElementById("pubNameInput").value;
   const category = document.getElementById("pubCategoryInput").value;
 
-  if (!name) return alert("Enter a pub name");
+  if (!name) return alert("Enter a pub name.");
 
   await addDoc(collection(db, "pubs"), {
     name,
@@ -65,31 +63,42 @@ document.getElementById("addPubBtn").onclick = async () => {
   document.getElementById("pubNameInput").value = "";
 };
 
-// Add pint
+/* ---------------------------------------------------
+   ADD PINT PRICE (NOW SUPPORTS PINT NAME)
+--------------------------------------------------- */
 document.getElementById("addPintBtn").onclick = async () => {
   const pubId = document.getElementById("pintPubSelect").value;
+  const pintName = document.getElementById("pintNameInput").value;
   const type = document.getElementById("pintTypeSelect").value;
   const price = parseFloat(document.getElementById("pintPriceInput").value);
 
-  if (!pubId || !price) return alert("Select a pub and enter a price");
+  if (!pubId || !price || !pintName) {
+    return alert("Enter pint name and price.");
+  }
 
   await addDoc(collection(db, "prices"), {
     pubId,
+    pintName,
     type,
     price,
     timestamp: Date.now()
   });
 
+  document.getElementById("pintNameInput").value = "";
   document.getElementById("pintPriceInput").value = "";
 };
 
-// Pint type filter
+/* ---------------------------------------------------
+   PINT TYPE FILTER
+--------------------------------------------------- */
 document.getElementById("filterType").onchange = (e) => {
   filterType = e.target.value;
   refreshUI();
 };
 
-// Admin toggle
+/* ---------------------------------------------------
+   ADMIN MODE TOGGLE
+--------------------------------------------------- */
 document.getElementById("adminToggle").onclick = () => {
   admin = !admin;
   document.getElementById("adminToggle").innerText = admin ? "⚙️ Admin: ON" : "⚙️ Admin: OFF";
@@ -98,7 +107,7 @@ document.getElementById("adminToggle").onclick = () => {
 };
 
 /* ---------------------------------------------------
-   UI REFRESH
+   MAIN UI REFRESH
 --------------------------------------------------- */
 function refreshUI() {
   populatePubSelect();
@@ -108,7 +117,7 @@ function refreshUI() {
   renderLeague();
   renderGoodInvestments();
   renderPubList();
-  renderAdmin();
+  renderAdminPanel();
 }
 
 /* ---------------------------------------------------
@@ -120,11 +129,8 @@ function populatePubSelect() {
 }
 
 /* ---------------------------------------------------
-   COMPUTE PUB STATS
-   - avgPrice
-   - trendPercent24
-   - volatility
-   - applies pint type filters
+   COMPUTE PUB METRICS (AVG, TREND, VOLATILITY)
+   ❗ includes pint type filtering
 --------------------------------------------------- */
 function computePubStats() {
 
@@ -132,7 +138,7 @@ function computePubStats() {
 
     let entries = prices.filter(p => p.pubId === pub.id);
 
-    // Apply pint-type filtering
+    // Apply pint-type filter
     if (filterType !== "all") {
       entries = entries.filter(e => e.type === filterType);
     }
@@ -144,35 +150,36 @@ function computePubStats() {
       return;
     }
 
-    /* ---- AVG PRICE ---- */
-    pub.avgPrice = entries.reduce((a,b)=>a+b.price,0) / entries.length;
+    /* ---- AVERAGE PRICE ---- */
+    pub.avgPrice = entries.reduce((a,b)=>a + b.price, 0) / entries.length;
 
-    /* ---- TREND (24h) ---- */
+    /* ---- 24H TREND ---- */
     const now = Date.now();
-    const lastDay = entries.filter(e => now - e.timestamp < 86400000);
+    const recent = entries.filter(e => now - e.timestamp < 86400000);
 
-    if (lastDay.length > 1) {
-      const first = lastDay[0].price;
-      const last = lastDay[lastDay.length - 1].price;
+    if (recent.length > 1) {
+      const first = recent[0].price;
+      const last = recent[recent.length - 1].price;
       pub.trendPercent24 = ((last - first) / first) * 100;
     } else {
       pub.trendPercent24 = 0;
     }
 
     /* ---- VOLATILITY ---- */
-    const values = entries.slice(-10).map(e => e.price);
-    if (values.length > 1) {
-      const avg = values.reduce((a,b)=>a+b,0) / values.length;
-      const variance = values.reduce((a,b)=>a + (b - avg) ** 2, 0) / values.length;
+    const lastValues = entries.slice(-10).map(e => e.price);
+    if (lastValues.length > 1) {
+      const avg = lastValues.reduce((a,b)=>a+b,0) / lastValues.length;
+      const variance = lastValues.reduce((a,b)=>a + (b - avg) ** 2, 0) / lastValues.length;
       pub.volatility = Math.sqrt(variance);
     } else {
       pub.volatility = 0;
     }
+
   });
 }
 
 /* ---------------------------------------------------
-   PINX INDEX
+   SHOW PINX INDEX
 --------------------------------------------------- */
 function renderPINX() {
   if (pubs.length === 0) return;
@@ -181,14 +188,14 @@ function renderPINX() {
 }
 
 /* ---------------------------------------------------
-   CHEAPEST PINT
+   SHOW CHEAPEST PINT
 --------------------------------------------------- */
 function renderCheapest() {
   const valid = pubs.filter(p => p.avgPrice > 0);
   if (valid.length === 0) return;
-  const p = valid.sort((a,b)=>a.avgPrice - b.avgPrice)[0];
+  const cheapest = valid.sort((a,b)=>a.avgPrice - b.avgPrice)[0];
   document.getElementById("cheapestValue").innerHTML =
-    `£${p.avgPrice.toFixed(2)} at ${p.name}`;
+    `£${cheapest.avgPrice.toFixed(2)} at ${cheapest.name}`;
 }
 
 /* ---------------------------------------------------
@@ -196,59 +203,59 @@ function renderCheapest() {
 --------------------------------------------------- */
 function renderLeague() {
   const mode = document.getElementById("leagueMode").value;
-  let arr = pubs.filter(p => p.avgPrice > 0);
+  let sorted = pubs.filter(p => p.avgPrice > 0);
 
-  if (mode === "cheapest") arr.sort((a,b)=>a.avgPrice - b.avgPrice);
-  if (mode === "drops") arr.sort((a,b)=>a.trendPercent24 - b.trendPercent24);
-  if (mode === "rises") arr.sort((a,b)=>b.trendPercent24 - a.trendPercent24);
-  if (mode === "volatile") arr.sort((a,b)=>b.volatility - a.volatility);
+  if (mode === "cheapest") sorted.sort((a,b)=>a.avgPrice - b.avgPrice);
+  if (mode === "drops") sorted.sort((a,b)=>a.trendPercent24 - b.trendPercent24);
+  if (mode === "rises") sorted.sort((a,b)=>b.trendPercent24 - a.trendPercent24);
+  if (mode === "volatile") sorted.sort((a,b)=>b.volatility - a.volatility);
 
   const tbody = document.querySelector("#leagueTable tbody");
-  tbody.innerHTML = arr.map(pub => `
+  tbody.innerHTML = sorted.map(pub => `
     <tr>
       <td>${pub.name}</td>
       <td>£${pub.avgPrice.toFixed(2)}</td>
-      <td>${trendCell(pub.trendPercent24)}</td>
+      <td>${trendFormat(pub.trendPercent24)}</td>
       <td><canvas class="spark" id="spark-${pub.id}"></canvas></td>
     </tr>
   `).join("");
 
-  arr.forEach(pub => drawSpark(pub.id));
+  sorted.forEach(pub => drawSpark(pub.id));
 }
 
-/* Helper: trend display with arrows + colors */
-function trendCell(value) {
+/* ---- Trend formatting with arrows ---- */
+function trendFormat(value) {
   if (value > 0) return `<span style="color:red;">▲ ${value.toFixed(1)}%</span>`;
   if (value < 0) return `<span style="color:green;">▼ ${Math.abs(value).toFixed(1)}%</span>`;
   return `<span style="color:grey;">→ 0%</span>`;
 }
 
 /* ---------------------------------------------------
-   SPARKLINE DRAWING (with rising/falling colour)
+   SPARKLINE (TREND GRAPH)
+   ❗ includes pint name + pint type filter
 --------------------------------------------------- */
 function drawSpark(pubId) {
-
   const canvas = document.getElementById(`spark-${pubId}`);
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  let arr = prices
+
+  let entries = prices
     .filter(p => p.pubId === pubId)
     .sort((a,b)=>a.timestamp - b.timestamp)
-    .slice(-10);
+    .slice(-20);
 
-  // Apply pint-type filtering
   if (filterType !== "all") {
-    arr = arr.filter(p => p.type === filterType);
+    entries = entries.filter(e => e.type === filterType);
   }
 
-  if (arr.length < 2) return;
+  if (entries.length < 2) return;
 
-  const values = arr.map(p => p.price);
+  const values = entries.map(e => e.price);
   const max = Math.max(...values);
   const min = Math.min(...values);
 
-  const rising = values[values.length - 1] >= values[0];
+  const rising = values.at(-1) >= values[0];
   ctx.strokeStyle = rising ? "#0a0" : "#c00";
 
   const w = canvas.width;
@@ -259,7 +266,7 @@ function drawSpark(pubId) {
 
   values.forEach((v,i)=>{
     const x = (i/(values.length-1)) * w;
-    const y = h - ((v-min) / (max-min)) * h;
+    const y = h - ((v - min) / (max - min)) * h;
     if (i === 0) ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   });
@@ -268,13 +275,14 @@ function drawSpark(pubId) {
 }
 
 /* ---------------------------------------------------
-   GOOD INVESTMENTS: avg below global + trending down
+   GOOD INVESTMENTS
 --------------------------------------------------- */
 function renderGoodInvestments() {
   if (pubs.length === 0) return;
 
   const globalAvg = pubs.reduce((a,b)=>a+b.avgPrice,0) / pubs.length;
-  const list = pubs.filter(p =>
+
+  const good = pubs.filter(p =>
     p.avgPrice > 0 &&
     p.avgPrice < globalAvg &&
     p.trendPercent24 < -2
@@ -282,13 +290,13 @@ function renderGoodInvestments() {
 
   const div = document.getElementById("goodInvestments");
 
-  if (list.length === 0) {
+  if (good.length === 0) {
     div.innerHTML = "No good opportunities right now.";
     return;
   }
 
-  div.innerHTML = list.map(p =>
-    `💡 <strong>${p.name}</strong> — £${p.avgPrice.toFixed(2)} (↓ ${Math.abs(p.trendPercent24).toFixed(1)}%)`
+  div.innerHTML = good.map(p =>
+    `💡 <b>${p.name}</b> — £${p.avgPrice.toFixed(2)} (↓ ${Math.abs(p.trendPercent24).toFixed(1)}%)`
   ).join("<br>");
 }
 
@@ -305,13 +313,22 @@ function renderPubList() {
 /* ---------------------------------------------------
    ADMIN PANEL
 --------------------------------------------------- */
-function renderAdmin() {
+function renderAdminPanel() {
   if (!admin) return;
-  const box = document.getElementById("adminContent");
-  box.innerHTML = `
+
+  const div = document.getElementById("adminContent");
+
+  div.innerHTML = `
     <h3>Pubs</h3>
     <pre>${JSON.stringify(pubs, null, 2)}</pre>
+
     <h3>Prices</h3>
-    <pre>${JSON.stringify(prices, null, 2)}</pre>
+    <pre>${JSON.stringify(prices.map(p => ({
+      pubId: p.pubId,
+      pintName: p.pintName,
+      type: p.type,
+      price: p.price,
+      timestamp: p.timestamp
+    })), null, 2)}</pre>
   `;
 }
