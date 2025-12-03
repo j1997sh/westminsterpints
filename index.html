@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Westminster Pints Exchange</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 
 <body>
@@ -23,121 +23,132 @@
     <p class="subtitle">Real-time pint prices across the Westminster Village</p>
   </header>
 
-  <!-- BUDGET HELPER -->
-  <section class="card highlight" id="budgetHelper">
-    <h2>👛 Pint Budget Helper</h2>
-    <label>Your Daily Budget:</label>
-    <input type="number" id="budgetInput" placeholder="£ (e.g. 15)">
-    <label>Maximum Price Per Pint:</label>
-    <input type="number" id="maxPriceInput" placeholder="£ (e.g. 6)">
-    <button id="saveBudgetBtn">Save Budget Settings</button>
-    <div id="budgetResults" class="budget-output"></div>
-  </section>
+  <!-- GRID WRAPPER -->
+  <main id="grid">
 
-  <!-- CHEAPEST PINT TOP BANNER -->
-  <section class="card highlight">
-    <h2>🏆 Cheapest Pint Right Now</h2>
-    <div id="cheapestTop" class="top-metric">Loading...</div>
-  </section>
+    <!-- LEFT COLUMN -->
+    <section class="col">
 
-  <!-- PINX INDEX -->
-  <section class="card">
-    <h2>📈 PINX Index</h2>
-    <div id="pinxValue" class="metric">Loading...</div>
-  </section>
+      <!-- Budget Helper -->
+      <div class="card" id="budgetHelper">
+        <h2>👛 Pint Budget Helper</h2>
+        <label>Your Daily Budget:</label>
+        <input id="budgetInput" type="number" placeholder="£ (e.g. 15)">
+        <label>Maximum Price Per Pint:</label>
+        <input id="maxPriceInput" type="number" placeholder="£ (e.g. 6)">
+        <button id="saveBudgetBtn">Save Budget Settings</button>
+        <div id="budgetResults" class="budget-output"></div>
+      </div>
 
-  <!-- ADD PINT -->
-  <section class="card" id="addPintCard">
-    <h2>🍺 Add Pint Price</h2>
+      <!-- Cheapest Pint -->
+      <div class="card" id="cheapestCard">
+        <h2>🏆 Cheapest Pint Right Now</h2>
+        <div id="cheapestTop" class="metric">Loading...</div>
+      </div>
 
-    <select id="pintPubSelect"></select>
-    <input id="pintNameInput" placeholder="Pint name (e.g. Peroni)">
-    <select id="pintTypeSelect">
-      <option value="Lager">🍺 Lager</option>
-      <option value="Ale">🍻 Ale</option>
-      <option value="IPA">🟢 IPA</option>
-      <option value="Guinness">⚫ Guinness</option>
-      <option value="Cider">🟡 Cider</option>
-    </select>
-    <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
-    <button id="addPintBtn">Add Price 💷</button>
-  </section>
+      <!-- Add Pint -->
+      <div class="card" id="addPintCard">
+        <h2>🍺 Add Pint Price</h2>
+        <select id="pintPubSelect"></select>
+        <input id="pintNameInput" placeholder="Pint name (e.g. Peroni)">
+        <select id="pintTypeSelect">
+          <option value="Lager">🍺 Lager</option>
+          <option value="Ale">🍻 Ale</option>
+          <option value="IPA">🟢 IPA</option>
+          <option value="Guinness">⚫ Guinness</option>
+          <option value="Cider">🟡 Cider</option>
+        </select>
+        <input id="pintPriceInput" type="number" step="0.01" placeholder="Price (£)">
+        <button id="addPintBtn">Add Price 💷</button>
+      </div>
 
-  <!-- ADD PUB -->
-  <section class="card">
-    <h2>➕ Add Pub</h2>
-    <input id="pubNameInput" placeholder="Pub name">
-    <button id="addPubBtn">Add Pub 🏛️</button>
-  </section>
+    </section>
 
-  <!-- POLLING INTENT -->
-  <section class="card" id="pollingIntent">
-    <h2>🗳️ Pint Polling Intent Meter</h2>
-    <div id="pollingBars"></div>
-    <div id="pollingLeader" class="polling-leader"></div>
-  </section>
+    <!-- RIGHT COLUMN -->
+    <section class="col">
 
-  <!-- MINI STATS -->
-  <section class="card" id="miniStats">
-    <h2>📊 Market Mini-Stats</h2>
-    <div id="miniStatsContent"></div>
-  </section>
+      <!-- PINX -->
+      <div class="card" id="pinxCard">
+        <h2>📈 PINX Index</h2>
+        <div id="pinxValue" class="metric">Loading...</div>
+      </div>
 
-  <!-- PUB LEAGUE -->
-  <section class="card full-width" id="pubLeague">
-    <h2>📊 Pub League</h2>
+      <!-- Add Pub -->
+      <div class="card" id="addPubCard">
+        <h2>➕ Add Pub</h2>
+        <input id="pubNameInput" placeholder="Pub name">
+        <button id="addPubBtn">Add Pub 🏛️</button>
+      </div>
 
-    <label>Filter League by Pint Type:</label>
-    <select id="leagueFilter">
-      <option value="all">All Types</option>
-      <option value="Lager">Lager</option>
-      <option value="Ale">Ale</option>
-      <option value="IPA">IPA</option>
-      <option value="Guinness">Guinness</option>
-      <option value="Cider">Cider</option>
-    </select>
+      <!-- Polling Intent -->
+      <div class="card" id="pollingIntent">
+        <h2>🗳️ Pint Polling Intent</h2>
+        <div id="pollingBars"></div>
+        <div id="pollingLeader" class="polling-leader"></div>
+      </div>
 
-    <select id="leagueMode">
-      <option value="cheapest">Cheapest</option>
-      <option value="drops">Biggest Drops</option>
-      <option value="rises">Biggest Rises</option>
-    </select>
+    </section>
 
-    <div id="pubTiles" class="pub-tiles-grid"></div>
-  </section>
+    <!-- FULL WIDTH BELOW -->
+    <section class="col-full">
+      <div class="card" id="miniStats">
+        <h2>📊 Market Mini-Stats</h2>
+        <div id="miniStatsContent"></div>
+      </div>
 
-  <!-- RECENT SUBMISSIONS FEED -->
-  <section class="card" id="recentFeed">
-    <h2>📰 Recent Submissions</h2>
-    <div id="recentFeedContent"></div>
-  </section>
+      <div class="card full-width" id="pubLeague">
+        <h2>📊 Pub League</h2>
+        <label>Filter League by Pint Type:</label>
+        <select id="leagueFilter">
+          <option value="all">All Types</option>
+          <option value="Lager">Lager</option>
+          <option value="Ale">Ale</option>
+          <option value="IPA">IPA</option>
+          <option value="Guinness">Guinness</option>
+          <option value="Cider">Cider</option>
+        </select>
+        <select id="leagueMode">
+          <option value="cheapest">Cheapest</option>
+          <option value="drops">Biggest Drops</option>
+          <option value="rises">Biggest Rises</option>
+        </select>
+        <div id="pubTiles" class="pub-tiles-grid"></div>
+      </div>
 
-  <!-- GOOD INVESTMENTS -->
-  <section class="card">
-    <h2>💡 Good Investments</h2>
-    <div id="goodInvestments"></div>
-  </section>
+      <div class="card" id="recentFeed">
+        <h2>📰 Recent Submissions</h2>
+        <div id="recentFeedContent"></div>
+      </div>
 
-  <!-- ADMIN -->
+      <div class="card" id="goodInvestmentsSection">
+        <h2>💡 Good Investments</h2>
+        <div id="goodInvestments"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Admin -->
   <div id="adminToggle">⚙️ Admin: OFF</div>
   <section id="adminPanel" class="card" style="display:none;">
     <h2>🛠️ Admin Panel</h2>
     <div id="adminContent"></div>
   </section>
 
-  <!-- FLASH TOAST -->
+  <!-- Toast -->
   <div id="flashToast" class="flash-toast"></div>
 
   <!-- MOBILE NAV -->
   <nav class="bottom-nav">
-    <div class="nav-item" onclick="scrollToSection('budgetHelper')">👛<div>Budget</div></div>
-    <div class="nav-item" onclick="scrollToSection('pollingIntent')">🗳️<div>Polls</div></div>
-    <div class="nav-item" onclick="scrollToSection('addPintCard')">🍺<div>Add</div></div>
-    <div class="nav-item" onclick="scrollToSection('pubLeague')">📊<div>League</div></div>
-    <div class="nav-item" onclick="scrollToSection('recentFeed')">📰<div>Feed</div></div>
+    <div onclick="scrollToSection('budgetHelper')" class="nav-item">👛<div>Budget</div></div>
+    <div onclick="scrollToSection('pollingIntent')" class="nav-item">🗳️<div>Polls</div></div>
+    <div onclick="scrollToSection('addPintCard')" class="nav-item">🍺<div>Add</div></div>
+    <div onclick="scrollToSection('pubLeague')" class="nav-item">📊<div>League</div></div>
+    <div onclick="scrollToSection('recentFeed')" class="nav-item">📰<div>Feed</div></div>
   </nav>
 
-  <script type="module" src="app.js"></script>
+  <!-- JS With Cache-Buster -->
+  <script type="module" src="app.js?v=4"></script>
 
   <script>
     function scrollToSection(id){
