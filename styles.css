@@ -60,7 +60,7 @@ html, body {
 }
 
 /* ---------------------------------------------------
-   METRIC CARD ROW
+   METRIC CARDS ROW
 --------------------------------------------------- */
 .metric-row {
   display: flex;
@@ -186,39 +186,43 @@ button:hover {
 }
 
 /* ---------------------------------------------------
-   LEAGUE TABLE (FOOTBALL STYLE)
+   FOOTBALL STYLE TABLES (PUB LEAGUE + DRINKS MENU)
 --------------------------------------------------- */
-.league-table {
+.league-table,
+.drinks-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 12px;
-  background: #fff;
+  margin-top: 10px;
 }
 
-.league-table th {
-  text-align: left;
-  padding: 8px;
+.league-table th,
+.drinks-table th {
   background: #f2f2f2;
+  padding: 8px;
+  text-align: left;
   font-size: 0.9rem;
   border-bottom: 1px solid #ddd;
 }
 
-.league-table td {
+.league-table td,
+.drinks-table td {
   padding: 8px;
   font-size: 0.95rem;
   border-bottom: 1px solid #eee;
 }
 
-.league-table tr:nth-child(even) {
+.league-table tr:nth-child(even),
+.drinks-table tr:nth-child(even) {
   background: #fafafa;
 }
 
-.league-table tr:hover {
+.league-table tr:hover,
+.drinks-table tr:hover {
   background: #f0f8ff;
 }
 
 /* ---------------------------------------------------
-   RECENT FEED (only 5 entries)
+   RECENT FEED
 --------------------------------------------------- */
 #recentFeed .feed-item {
   padding: 8px 0;
@@ -258,7 +262,7 @@ button:hover {
 }
 
 /* ---------------------------------------------------
-   TOASTS
+   TOAST
 --------------------------------------------------- */
 .toast {
   position: fixed;
