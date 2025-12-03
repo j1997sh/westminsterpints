@@ -11,10 +11,10 @@
   <!-- HEADER -->
   <header class="top-header">
     <h1>🍻 Westminster Pints Exchange</h1>
-    <p class="subtitle">Live pub prices from the heart of politics</p>
+    <p class="subtitle">Live pint prices from the heart of politics</p>
   </header>
 
-  <!-- CHEAPEST PINT AT TOP -->
+  <!-- CHEAPEST PINT TOP BANNER -->
   <section class="card highlight">
     <h2>🏆 Cheapest Pint Right Now</h2>
     <div id="cheapestTop" class="top-metric">Loading...</div>
@@ -26,7 +26,7 @@
     <div id="pinxValue" class="metric">Loading...</div>
   </section>
 
-  <!-- ADD PINT PRICE -->
+  <!-- ADD PINT -->
   <section class="card" id="addPintCard">
     <h2>🍺 Add Pint Price</h2>
 
@@ -69,17 +69,31 @@
     </select>
   </section>
 
-  <!-- COLLAPSIBLE PUB TILES (LEAGUE TABLE) -->
+  <!-- TICKER TAPE -->
+  <section class="ticker-wrapper">
+    <div id="tickerTape" class="ticker"></div>
+  </section>
+
+  <!-- DAILY MARKET MOVERS -->
+  <section class="card">
+    <h2>📉📈 Daily Market Movers</h2>
+    <div id="marketMovers"></div>
+  </section>
+
+  <!-- MOST ACTIVE PUBS -->
+  <section class="card">
+    <h2>🔥 Most Active Pubs Today</h2>
+    <div id="mostActive"></div>
+  </section>
+
+  <!-- PUB LEAGUE -->
   <section class="card">
     <h2>📊 Pub League</h2>
-
     <select id="leagueMode">
       <option value="cheapest">Cheapest</option>
       <option value="drops">Biggest Drops</option>
       <option value="rises">Biggest Rises</option>
-      <option value="volatile">Most Volatile</option>
     </select>
-
     <div id="pubTiles"></div>
   </section>
 
@@ -96,19 +110,19 @@
     <div id="adminContent"></div>
   </section>
 
-  <!-- BOTTOM NAV (MOBILE APP STYLE) -->
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <div class="nav-item" onclick="scrollToSection('addPintCard')">🍺<br>Add Pint</div>
-    <div class="nav-item" onclick="scrollToSection('pubTiles')">📊<br>League</div>
-    <div class="nav-item" onclick="scrollToSection('goodInvestments')">💡<br>Invest</div>
-    <div class="nav-item" onclick="scrollToSection('filterType')">🔎<br>Filter</div>
-    <div class="nav-item" onclick="scrollToSection('adminToggle')">⚙️<br>Admin</div>
+    <div class="nav-item" onclick="scrollToSection('addPintCard')">🍺<div>Add Pint</div></div>
+    <div class="nav-item" onclick="scrollToSection('pubTiles')">📊<div>League</div></div>
+    <div class="nav-item" onclick="scrollToSection('goodInvestments')">💡<div>Invest</div></div>
+    <div class="nav-item" onclick="scrollToSection('filterType')">🔎<div>Filter</div></div>
+    <div class="nav-item" onclick="scrollToSection('adminToggle')">⚙️<div>Admin</div></div>
   </nav>
 
   <script type="module" src="app.js"></script>
 
   <script>
-    function scrollToSection(id){
+    function scrollToSection(id) {
       document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     }
   </script>
