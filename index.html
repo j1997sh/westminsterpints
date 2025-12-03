@@ -1,149 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Westminster Pints Exchange</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Westminster Pints Exchange</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 
 <body>
 
 <!-- HEADER -->
 <header class="top-header">
-    <h1>🍺 Westminster Pints Exchange</h1>
-    <p class="subtitle">Real-time pint prices across Westminster</p>
+  <h1>🍺 Westminster Pints Exchange</h1>
+  <p class="subtitle">Real-time Pint Prices Across Westminster</p>
 </header>
 
-<!-- CHEAPEST PINT BANNER -->
-<section id="cheapestBanner" class="cheapest-banner card">
-    <h2>🏆 Cheapest Pint Right Now</h2>
-    <div id="cheapestBannerText">Loading...</div>
+<!-- CHEAPEST BANNER -->
+<section class="cheapest-banner card" id="cheapestBanner">
+  <h2>🏆 Cheapest Pint Right Now</h2>
+  <div id="cheapestBannerText">Loading…</div>
 </section>
 
-<!-- LIVE TICKER -->
-<section id="liveTicker" class="ticker card">
-    <span id="tickerText">Loading market activity…</span>
+<!-- TICKER -->
+<section class="card" id="liveTicker">
+  <div id="tickerText">Loading market activity…</div>
 </section>
 
-<!-- METRICS ROW -->
+<!-- METRICS -->
 <section class="metric-row card">
-    <div>
-        <h3>📈 PINX Index</h3>
-        <div id="pinxValue">Loading...</div>
-        <div id="pinxExplanation" class="explain">
-            The Pint Index (PINX) tracks average pint price movement and activity.
-        </div>
-    </div>
+  <div>
+    <h3>📈 PINX Index</h3>
+    <div id="pinxValue">—</div>
+  </div>
 
-    <div>
-        <h3>🔥 Most Popular Pint Today</h3>
-        <div id="mostPopularPint">Loading...</div>
-    </div>
+  <div>
+    <h3>🔥 Most Popular Pint</h3>
+    <div id="mostPopularPint">—</div>
+  </div>
 </section>
 
 <!-- ADD PINT PRICE -->
 <section class="card" id="addPintCard">
-    <h2>🍻 Add Pint Price</h2>
-
-    <select id="addPintPubSelect"></select>
-    <select id="addPintTypeSelect"></select>
-    <input id="addPintPriceInput" type="number" step="0.01" placeholder="Price (£)">
-    <button id="addPintPriceBtn">Add Price 💷</button>
+  <h2>🍻 Add Pint Price</h2>
+  <select id="addPintPubSelect"></select>
+  <select id="addPintTypeSelect"></select>
+  <input id="addPintPriceInput" type="number" step="0.01" placeholder="Price (£)">
+  <button id="addPintPriceBtn">Add Price 💷</button>
 </section>
 
 <!-- ADD PINT NAME -->
 <section class="card" id="addPintNameCard">
-    <h2>🍺 Add Pint Name</h2>
-    <input id="newPintNameInput" placeholder="Pint name (e.g. Peroni)">
-    <button id="addPintNameBtn">Add Pint Name ➕</button>
+  <h2>🍺 Add Pint Name</h2>
+  <input id="newPintNameInput" placeholder="e.g. Peroni">
+  <button id="addPintNameBtn">Add Pint Name ➕</button>
 </section>
 
 <!-- ADD PUB -->
 <section class="card" id="addPubCard">
-    <h2>🏛️ Add Pub</h2>
-    <input id="newPubNameInput" placeholder="Pub name">
-    <button id="addPubBtn">Add Pub 🏛️</button>
+  <h2>🏛️ Add Pub</h2>
+  <input id="newPubNameInput" placeholder="Pub name">
+  <button id="addPubBtn">Add Pub 🏛️</button>
 </section>
 
 <!-- BUDGET PLANNER -->
 <section class="card" id="budgetPlannerCard">
-    <h2>💷 Pint Budget Helper</h2>
-    <input id="budgetInput" type="number" placeholder="Enter your total budget (£)">
-    <button id="runBudgetBtn">Calculate</button>
-
-    <div id="budgetResult"></div>
+  <h2>💷 Pint Budget Helper</h2>
+  <input id="budgetInput" type="number" placeholder="Budget (£)">
+  <button id="runBudgetBtn">Calculate</button>
+  <div id="budgetResult" style="margin-top:12px;">Enter a budget.</div>
 </section>
 
 <!-- CHEAPEST BY PINT NAME -->
 <section class="card" id="cheapestByPintNameCard">
-    <h2>🔎 Cheapest By Pint Type</h2>
-    <select id="cheapestPintNameSelect"></select>
-    <button id="findCheapestByNameBtn">Find Cheapest</button>
-
-    <div id="cheapestPintByNameResult"></div>
+  <h2>🔎 Cheapest By Pint Name</h2>
+  <select id="cheapestPintNameSelect"></select>
+  <button id="findCheapestByNameBtn">Find Cheapest</button>
+  <div id="cheapestPintByNameResult"></div>
 </section>
 
 <!-- PUB MENUS -->
 <section class="card" id="pubMenusCard">
-    <h2>📜 Pub Drinks Menus</h2>
-    <div id="pubMenusContainer">Loading...</div>
+  <h2>📜 Pub Drinks Menus</h2>
+  <div id="pubMenusContainer"></div>
 </section>
 
 <!-- PUB LEAGUE -->
 <section class="card" id="pubLeagueCard">
-    <h2>📊 Pub League Table</h2>
+  <h2>📊 Pub League Table</h2>
 
-    <h3>Top 5 Cheapest</h3>
-    <table id="cheapestTable"></table>
+  <h3>Top 5 Cheapest</h3>
+  <table id="cheapestTable"></table>
 
-    <h3>Top 5 Most Expensive</h3>
-    <table id="expensiveTable"></table>
+  <h3>Top 5 Most Expensive</h3>
+  <table id="expensiveTable"></table>
 
-    <button id="showFullLeagueBtn">Show Full League</button>
-    <div id="fullLeagueTable" style="display:none;"></div>
+  <button id="showFullLeagueBtn">Show Full League ▼</button>
+  <div id="fullLeagueTable" style="display:none;"></div>
 </section>
 
-<!-- RECENT SUBMISSIONS -->
-<section class="card" id="recentSubmissionsCard">
-    <h2>🕒 Recent Submissions</h2>
-    <div id="recentSubmissions"></div>
+<!-- PINT TYPE FINDER (New Position) -->
+<section class="card" id="pintTypeFinderCard">
+  <h2>🍺 Pint Type Finder</h2>
+  <select id="pintTypeFinderSelect"></select>
+  <button id="findPintTypeBtn">Find Cheapest</button>
+  <div id="pintTypeFinderResult"></div>
 </section>
 
-<!-- SWING-O-METER (AVAILABILITY) -->
+<!-- SWING-O-METER -->
 <section class="card" id="swingCard">
-    <h2>📦 Pint Availability Swing-o-Meter</h2>
-    <table id="swingTable"></table>
+  <h2>📦 Pint Availability Swing-o-Meter</h2>
+  <table id="swingTable"></table>
 </section>
 
-<!-- CLUSTER DETECTOR -->
+<!-- PINT CLUSTER DETECTOR -->
 <section class="card" id="clusterCard">
-    <h2>📊 Pint Cluster Detector</h2>
-    <div id="clusterContent"></div>
+  <h2>📊 Pint Cluster Detector</h2>
+  <div id="clusterContent"></div>
 </section>
 
 <!-- RARITY TABLE -->
 <section class="card" id="rarityCard">
-    <h2>🧭 Pint Rarity & Availability</h2>
-    <div id="rarityTable"></div>
+  <h2>🧭 Pint Rarity & Availability</h2>
+  <div id="rarityTable"></div>
 </section>
 
-<!-- FIND CHEAPEST BY PINT TYPE -->
-<section class="card" id="pintTypeFinderCard">
-    <h2>🍺 Pint Type Finder (Cheapest Place)</h2>
-    <select id="pintTypeFinderSelect"></select>
-    <button id="findPintTypeBtn">Find Cheapest</button>
-
-    <div id="pintTypeFinderResult"></div>
+<!-- RECENT SUBMISSIONS (Now at bottom) -->
+<section class="card" id="recentSubmissionsCard">
+  <h2>🕒 Recent Submissions</h2>
+  <div id="recentSubmissions"></div>
 </section>
 
 <!-- MODAL -->
-<div id="pubModal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <h3>Pubs Serving This Pint</h3>
-        <div id="modalPubList"></div>
-        <button id="closeModalBtn">Close</button>
-    </div>
+<div id="pubModal" class="modal">
+  <div class="modal-content">
+    <h3>Pubs Serving This Pint</h3>
+    <div id="modalPubList"></div>
+    <button id="closeModalBtn">Close</button>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -151,13 +144,15 @@
 
 <!-- MOBILE NAV -->
 <nav class="bottom-nav">
-    <button data-target="cheapestBanner">🏠</button>
-    <button data-target="addPintCard">➕</button>
-    <button data-target="pubLeagueCard">📊</button>
-    <button data-target="pubMenusCard">📜</button>
-    <button data-target="budgetPlannerCard">💷</button>
+  <button data-target="cheapestBanner">🏠</button>
+  <button data-target="addPintCard">➕</button>
+  <button data-target="pubLeagueCard">📊</button>
+  <button data-target="pubMenusCard">📜</button>
+  <button data-target="budgetPlannerCard">💷</button>
 </nav>
 
-<script type="module" src="app.js?v=29"></script>
+<!-- JS -->
+<script type="module" src="app.js?v=30"></script>
+
 </body>
 </html>
