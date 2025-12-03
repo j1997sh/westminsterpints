@@ -1,14 +1,11 @@
 /* ---------------------------------------------------
-   FIREBASE IMPORTS
+   FIREBASE
 --------------------------------------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, addDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* ---------------------------------------------------
-   FIREBASE CONFIG
---------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBHUGgt8F4OQJjdx11qOMPC0iRJGFZmU8E",
   authDomain: "westminsterpints.firebaseapp.com",
@@ -22,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* ---------------------------------------------------
-   GLOBAL STATE
+   STATE
 --------------------------------------------------- */
 let pubs = [];
 let prices = [];
@@ -32,12 +29,13 @@ let filterType = "all";
 /* ---------------------------------------------------
    FIRESTORE LISTENERS
 --------------------------------------------------- */
-onSnapshot(collection(db, "pubs"), snap => {
-  pubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+onSnapshot(collection(db, "pubs"), s => {
+  pubs = s.docs.map(d => ({ id: d.id, ...d.data() }));
   refreshUI();
 });
-onSnapshot(collection(db, "prices"), snap => {
-  prices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+onSnapshot(collection(db, "prices"), s => {
+  prices = s.docs.map(d => ({ id: d.id, ...d.data() }));
   refreshUI();
 });
 
@@ -70,8 +68,7 @@ document.getElementById("addPintBtn").onclick = async () => {
   const type = document.getElementById("pintTypeSelect").value;
   const price = parseFloat(document.getElementById("pintPriceInput").value);
 
-  if (!pubId || !price || !pintName)
-    return alert("Enter pint name and price");
+  if (!pubId || !pintName || !price) return alert("Missing fields");
 
   await addDoc(collection(db, "prices"), {
     pubId, pintName, type, price,
@@ -103,20 +100,23 @@ document.getElementById("adminToggle").onclick = () => {
 };
 
 /* ---------------------------------------------------
-   UI UPDATE
+   MAIN REFRESH
 --------------------------------------------------- */
 function refreshUI() {
   populatePubSelect();
   computePubStats();
   renderPINX();
   renderCheapestTop();
-  renderGoodInvestments();
+  renderTicker();
+  renderMarketMovers();
+  renderMostActive();
   renderPubTiles();
+  renderGoodInvestments();
   renderAdmin();
 }
 
 /* ---------------------------------------------------
-   POPULATE SELECT
+   POPULATE PUB SELECT
 --------------------------------------------------- */
 function populatePubSelect() {
   document.getElementById("pintPubSelect").innerHTML =
@@ -124,7 +124,7 @@ function populatePubSelect() {
 }
 
 /* ---------------------------------------------------
-   COMPUTE PUB STATS (avg, trend, vol)
+   COMPUTE METRICS
 --------------------------------------------------- */
 function computePubStats() {
   pubs.forEach(pub => {
@@ -134,109 +134,131 @@ function computePubStats() {
     if (filterType !== "all")
       entries = entries.filter(e => e.type === filterType);
 
-    if (entries.length === 0) {
+    if (!entries.length) {
       pub.avgPrice = 0;
       pub.trendPercent24 = 0;
-      pub.volatility = 0;
       return;
     }
 
     pub.avgPrice =
       entries.reduce((a,b)=>a+b.price,0) / entries.length;
 
+    /* trend 24h */
     const now = Date.now();
-    const lastDay = entries.filter(
-      e => now - e.timestamp < 86400000
-    );
+    const day = entries.filter(e => now - e.timestamp < 86400000);
 
-    if (lastDay.length > 1) {
-      const first = lastDay[0].price;
-      const last = lastDay[lastDay.length - 1].price;
+    if (day.length > 1) {
+      const first = day[0].price;
+      const last = day[day.length - 1].price;
       pub.trendPercent24 = ((last - first) / first) * 100;
+    } else {
+      pub.trendPercent24 = 0;
     }
 
-    const last10 = entries.slice(-10).map(e => e.price);
-    if (last10.length > 1) {
-      const avg = last10.reduce((a,b)=>a+b,0) / last10.length;
-      const variance = last10.reduce((a,b)=>a + (b-avg)**2, 0) / last10.length;
-      pub.volatility = Math.sqrt(variance);
-    }
+    /* activity */
+    pub.activity = day.length;
   });
 }
 
 /* ---------------------------------------------------
-   PINX
+   PINX INDEX
 --------------------------------------------------- */
 function renderPINX() {
   if (!pubs.length) return;
-  const avg = pubs.reduce((a,b)=>a+b.avgPrice,0) / pubs.length;
-  document.getElementById("pinxValue").textContent = Math.round(avg*100);
+  const avg =
+    pubs.reduce((a,b)=>a+b.avgPrice,0) / pubs.length;
+  document.getElementById("pinxValue").textContent =
+    Math.round(avg * 100);
 }
 
 /* ---------------------------------------------------
-   CHEAPEST PINT AT TOP
+   CHEAPEST PINT TOP BANNER
 --------------------------------------------------- */
 function renderCheapestTop() {
   const valid = pubs.filter(p => p.avgPrice > 0);
   if (!valid.length) return;
-  const cheapest = valid.sort((a,b)=>a.avgPrice - b.avgPrice)[0];
+  const c = valid.sort((a,b)=>a.avgPrice - b.avgPrice)[0];
   document.getElementById("cheapestTop").innerHTML =
-    `£${cheapest.avgPrice.toFixed(2)} at ${cheapest.name}`;
+    `£${c.avgPrice.toFixed(2)} at ${c.name}`;
 }
 
 /* ---------------------------------------------------
-   PUB BADGES LOGIC
+   PUB BADGES
 --------------------------------------------------- */
 function pubBadges(pub) {
-  let badges = [];
-
-  if (pub.avgPrice && pub.avgPrice < 5) badges.push("⭐ Cheap");
-
-  if (pub.trendPercent24 < -3) badges.push("📉 Dropping");
-  if (pub.trendPercent24 > 3)  badges.push("📈 Rising");
-
-  if (pub.volatility > 0.3) badges.push("🔔 Volatile");
-
-  return badges.join(" • ") || "—";
+  let b = [];
+  if (pub.avgPrice < 5) b.push("⭐ Cheap");
+  if (pub.trendPercent24 < -3) b.push("📉 Dropping");
+  if (pub.trendPercent24 > 3) b.push("📈 Rising");
+  return b.join(" • ") || "—";
 }
 
 /* ---------------------------------------------------
-   RENDER PUB TILES (COLLAPSIBLE)
+   TICKER TAPE (MEDIUM SPEED)
 --------------------------------------------------- */
-function renderPubTiles() {
-  const mode = document.getElementById("leagueMode").value;
-  let list = pubs.filter(p => p.avgPrice > 0);
+function renderTicker() {
+  const ticker = document.getElementById("tickerTape");
 
-  if (mode === "cheapest") list.sort((a,b)=>a.avgPrice - b.avgPrice);
-  if (mode === "drops")    list.sort((a,b)=>a.trendPercent24 - b.trendPercent24);
-  if (mode === "rises")    list.sort((a,b)=>b.trendPercent24 - a.trendPercent24);
-  if (mode === "volatile") list.sort((a,b)=>b.volatility - a.volatility);
+  let items = pubs
+    .filter(p => p.avgPrice > 0)
+    .map(p => {
+      let arrow = p.trendPercent24 > 0
+        ? `▲ ${p.trendPercent24.toFixed(1)}%`
+        : p.trendPercent24 < 0
+        ? `▼ ${Math.abs(p.trendPercent24).toFixed(1)}%`
+        : `→ 0%`;
+      return `${p.name} £${p.avgPrice.toFixed(2)} ${arrow}`;
+    });
 
-  document.getElementById("pubTiles").innerHTML = list.map(pub => `
-    <div class="pub-tile" onclick="toggleTile('${pub.id}')">
-      <div class="pub-header">
-        <span>${pub.name}</span>
-        <span>£${pub.avgPrice.toFixed(2)}</span>
-      </div>
-      <div class="pub-badges">${pubBadges(pub)}</div>
-
-      <div id="tile-${pub.id}" style="display:none;">
-        <div><strong>24h:</strong> ${trendFormat(pub.trendPercent24)}</div>
-        <canvas class="spark" id="spark-${pub.id}"></canvas>
-      </div>
-    </div>
-  `).join("");
-
-  list.forEach(pub => drawSpark(pub.id));
+  ticker.innerText = items.join("   |   ");
 }
 
 /* ---------------------------------------------------
-   COLLAPSE HANDLER
+   MARKET MOVERS (RISERS + FALLERS)
 --------------------------------------------------- */
-window.toggleTile = (id) => {
-  const el = document.getElementById("tile-" + id);
-  el.style.display = el.style.display === "none" ? "block" : "none";
-};
+function renderMarketMovers() {
+  const div = document.getElementById("marketMovers");
+
+  let movers = pubs.filter(p => p.avgPrice > 0);
+
+  let risers = [...movers]
+    .sort((a,b)=>b.trendPercent24 - a.trendPercent24)
+    .slice(0, 3);
+
+  let fallers = [...movers]
+    .sort((a,b)=>a.trendPercent24 - b.trendPercent24)
+    .slice(0, 3);
+
+  const format = p =>
+    `${p.name}: £${p.avgPrice.toFixed(2)} (${trendFormat(p.trendPercent24)})`;
+
+  div.innerHTML = `
+    <strong>Top Risers:</strong><br>
+    ${risers.map(format).join("<br>")}<br><br>
+    <strong>Top Fallers:</strong><br>
+    ${fallers.map(format).join("<br>")}
+  `;
+}
+
+/* ---------------------------------------------------
+   MOST ACTIVE PUBS (TOP 3)
+--------------------------------------------------- */
+function renderMostActive() {
+  const div = document.getElementById("mostActive");
+
+  let actives = pubs
+    .sort((a,b)=>b.activity - a.activity)
+    .slice(0, 3);
+
+  if (!actives.length) {
+    div.innerHTML = "Not enough data yet.";
+    return;
+  }
+
+  div.innerHTML = actives.map(p =>
+    `🔥 <b>${p.name}</b> — ${p.activity} submissions today`
+  ).join("<br>");
+}
 
 /* ---------------------------------------------------
    TREND FORMAT
@@ -248,24 +270,60 @@ function trendFormat(v) {
 }
 
 /* ---------------------------------------------------
-   SPARKLINES
+   PUB TILES
+--------------------------------------------------- */
+function renderPubTiles() {
+  const mode = document.getElementById("leagueMode").value;
+
+  let list = pubs.filter(p => p.avgPrice > 0);
+
+  if (mode === "cheapest") list.sort((a,b)=>a.avgPrice - b.avgPrice);
+  if (mode === "drops")    list.sort((a,b)=>a.trendPercent24 - b.trendPercent24);
+  if (mode === "rises")    list.sort((a,b)=>b.trendPercent24 - a.trendPercent24);
+
+  document.getElementById("pubTiles").innerHTML =
+    list.map(pub => `
+      <div class="pub-tile" onclick="toggleTile('${pub.id}')">
+        <div class="pub-header">
+          <span>${pub.name}</span>
+          <span>£${pub.avgPrice.toFixed(2)}</span>
+        </div>
+        <div class="pub-badges">${pubBadges(pub)}</div>
+        <div id="tile-${pub.id}" style="display:none;">
+          <div><strong>24h Trend:</strong> ${trendFormat(pub.trendPercent24)}</div>
+          <canvas class="spark" id="spark-${pub.id}"></canvas>
+        </div>
+      </div>
+    `).join("");
+
+  list.forEach(pub => drawSpark(pub.id));
+}
+
+window.toggleTile = id => {
+  const el = document.getElementById("tile-"+id);
+  el.style.display = el.style.display === "none" ? "block" : "none";
+};
+
+/* ---------------------------------------------------
+   SPARKLINE
 --------------------------------------------------- */
 function drawSpark(pubId) {
   const canvas = document.getElementById(`spark-${pubId}`);
   if (!canvas) return;
+
   const ctx = canvas.getContext("2d");
 
-  let arr = prices
+  let pts = prices
     .filter(p => p.pubId === pubId)
     .sort((a,b)=>a.timestamp - b.timestamp)
     .slice(-20);
 
   if (filterType !== "all")
-    arr = arr.filter(e => e.type === filterType);
+    pts = pts.filter(p => p.type === filterType);
 
-  if (arr.length < 2) return;
+  if (pts.length < 2) return;
 
-  const values = arr.map(p => p.price);
+  const values = pts.map(p => p.price);
   const max = Math.max(...values);
   const min = Math.min(...values);
   const rise = values.at(-1) >= values[0];
@@ -287,17 +345,13 @@ function drawSpark(pubId) {
    GOOD INVESTMENTS
 --------------------------------------------------- */
 function renderGoodInvestments() {
-  if (!pubs.length) return;
-
-  const globalAvg =
+  const div = document.getElementById("goodInvestments");
+  const avg =
     pubs.reduce((a,b)=>a+b.avgPrice,0) / pubs.length;
 
   const good = pubs.filter(p =>
-    p.avgPrice < globalAvg &&
-    p.trendPercent24 < -2
+    p.avgPrice < avg && p.trendPercent24 < -2
   );
-
-  const div = document.getElementById("goodInvestments");
 
   if (!good.length) {
     div.innerHTML = "No good opportunities right now.";
@@ -314,7 +368,6 @@ function renderGoodInvestments() {
 --------------------------------------------------- */
 function renderAdmin() {
   if (!admin) return;
-  document.getElementById("adminContent").innerHTML = `
-    <pre>${JSON.stringify({ pubs, prices }, null, 2)}</pre>
-  `;
+  document.getElementById("adminContent").innerHTML =
+    `<pre>${JSON.stringify({ pubs, prices }, null, 2)}</pre>`;
 }
