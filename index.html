@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Westminster Pints Exchange</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="styles.css?v=21">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
     <div id="cheapestBannerText">Finding cheapest pint…</div>
   </section>
 
-  <!-- METRIC CARDS ROW -->
+  <!-- METRIC CARDS ROW (now only 2 cards) -->
   <section class="metric-row">
 
     <div class="metric-card">
@@ -31,11 +31,6 @@
     <div class="metric-card">
       <h3>📊 Top Types This Week</h3>
       <div id="weeklyTypesValue" class="metric-small">—</div>
-    </div>
-
-    <div class="metric-card">
-      <h3>💰 Money in PINX</h3>
-      <div id="moneyInvestedValue" class="metric-small">—</div>
     </div>
 
   </section>
@@ -97,6 +92,21 @@
       <div id="cheapestPintResult" class="subnote" style="margin-top:10px;">—</div>
     </section>
 
+    <!-- BUDGET PLANNER V2 -->
+    <section class="card" id="budgetPlannerCard">
+      <h2>💰 Budget Planner</h2>
+
+      <label>Your Budget (£):</label>
+      <input id="budgetInput" type="number" placeholder="e.g. 20">
+
+      <label>Max Price Per Pint (£):</label>
+      <input id="budgetMaxInput" type="number" placeholder="e.g. 6">
+
+      <button id="runBudgetBtn">Find Best Pub 🎯</button>
+
+      <div id="budgetResult" style="margin-top:12px;" class="subnote">Enter a budget to begin.</div>
+    </section>
+
     <!-- TWO-COLUMN LAYOUT -->
     <div class="columns">
 
@@ -144,6 +154,16 @@
 
         </section>
 
+        <!-- DRINKS MENU (NEW) -->
+        <section class="card" id="drinksMenuCard">
+          <h2>📜 Drinks Menu</h2>
+
+          <label>Select Pub:</label>
+          <select id="drinksMenuSelect"></select>
+
+          <table id="drinksMenuTable" class="drinks-table"></table>
+        </section>
+
         <!-- RECENT FEED -->
         <section class="card" id="recentFeedCard">
           <h2>📰 Recent Submissions</h2>
@@ -155,6 +175,7 @@
 
   </main>
 
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="scrollToId('addPintCard')">🍺<div>Add</div></div>
     <div class="nav-item" onclick="scrollToId('pubLeagueCard')">📊<div>League</div></div>
@@ -163,7 +184,7 @@
 
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="app.js?v=20"></script>
+  <script type="module" src="app.js?v=21"></script>
   <script>
     function scrollToId(id){
       document.getElementById(id).scrollIntoView({behavior:"smooth"});
