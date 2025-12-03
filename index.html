@@ -63,7 +63,7 @@
       <label>Price (£):</label>
       <input id="pintPriceInput" type="number" step="0.01">
 
-      <button id="addPintPriceBtn">Add Pint Price 💷</button>
+      <button id="addPintPriceBtn">Add Price 💷</button>
     </section>
 
     <!-- ADD PINT NAME -->
@@ -160,21 +160,29 @@
           <table id="drinksMenuTable" class="drinks-table"></table>
         </section>
 
-        <!-- NEW CARD 1: Swing-o-Meter -->
+        <!-- SWING-O-METER (FIXED) -->
         <section class="card" id="swingCard">
           <h2>🗳️ Pint Availability Swing-o-Meter</h2>
           <p class="subnote">Which pints gained or lost availability this week.</p>
-          <table id="swingTable" class="swing-table"></table>
+
+          <div class="table-wrapper">
+            <table id="swingTable" class="swing-table">
+              <!-- JS inserts contents -->
+            </table>
+          </div>
         </section>
 
-        <!-- NEW CARD 2: Pint Clusters -->
+        <!-- CLUSTER DETECTOR (FIXED) -->
         <section class="card" id="clusterCard">
           <h2>📊 Pint Cluster Detector</h2>
           <p class="subnote">Automatic price tier grouping based on Westminster data.</p>
-          <div id="clusterContent"></div>
+
+          <div id="clusterContent" class="cluster-box">
+            <!-- JS inserts clusters -->
+          </div>
         </section>
 
-        <!-- NEW CARD 3: Rarity Key -->
+        <!-- RARITY KEY -->
         <section class="card" id="rarityCard">
           <h2>💎 Pint Rarity Key</h2>
           <ul class="rarity-list">
@@ -196,7 +204,7 @@
     </div>
   </main>
 
-  <!-- MOBILE NAV -->
+  <!-- MOBILE NAV (UPDATED) -->
   <nav class="bottom-nav">
     <div class="nav-item" onclick="scrollToId('addPintCard')">🍺<div>Add</div></div>
     <div class="nav-item" onclick="scrollToId('pubLeagueCard')">📊<div>League</div></div>
@@ -205,7 +213,7 @@
     <div class="nav-item" onclick="scrollToId('recentFeedCard')">📰<div>Feed</div></div>
   </nav>
 
-  <!-- MODAL POPUP FOR "VIEW THESE PUBS" -->
+  <!-- MODAL -->
   <div id="pubModal" class="modal">
     <div class="modal-content">
       <span id="modalClose" class="modal-close">&times;</span>
@@ -218,7 +226,7 @@
   <div id="toast" class="toast"></div>
 
   <!-- JS -->
-  <script type="module" src="app.js?v=23"></script>
+  <script type="module" src="app.js?v=28"></script>
   <script>
     function scrollToId(id){
       document.getElementById(id).scrollIntoView({behavior:"smooth"});
