@@ -1,91 +1,89 @@
-// ------------------------------------------------------
-// FIREBASE INITIALISATION
-// ------------------------------------------------------
+/* -------------------------------------------
+   FIREBASE INITIALISATION
+------------------------------------------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-    getFirestore, collection, getDocs, addDoc, query, orderBy
+    getFirestore, collection, addDoc, getDocs, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAvYyMtp3loqVH4-eGNP54u13OOYKh-lKQ",
-    authDomain: "pintpriceapp.firebaseapp.com",
-    projectId: "pintpriceapp",
-    storageBucket: "pintpriceapp.appspot.com",
-    messagingSenderId: "527288189402",
-    appId: "1:527288189402:web:82152e4d95878811fd2e8f"
+    apiKey: "AIzaSyBHUGg8f4OQJdx11qOMPCOirjGFZmU8E",
+    authDomain: "westminsterpints.firebaseapp.com",
+    projectId: "westminsterpints",
+    storageBucket: "westminsterpints.appspot.com",
+    messagingSenderId: "913960848966",
+    appId: "1:913960848966:web:df6355a6b5b25dbdc5c447"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-console.log("Westminster Pint Index initialised.");
-
-
-// ------------------------------------------------------
-// DOM ELEMENT SHORTCUT
-// ------------------------------------------------------
+/* -------------------------------------------
+   DOM HELPERS
+------------------------------------------- */
 const $ = id => document.getElementById(id);
 
-
-// ------------------------------------------------------
-// LOAD DATA
-// ------------------------------------------------------
-async function loadPubs() {
-    const snap = await getDocs(collection(db, "pubs"));
-    const pubs = [];
-    snap.forEach(doc => pubs.push({ id: doc.id, ...doc.data() }));
-
-    // Populate dropdowns
-    const pubSelect = $("pricePubSelect");
-    pubSelect.innerHTML = pubs.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
-
-    return pubs;
-}
-
+/* -------------------------------------------
+   LOAD DATA INTO SELECT ELEMENTS
+------------------------------------------- */
 async function loadPintNames() {
     const snap = await getDocs(collection(db, "pintNames"));
-    const pints = [];
-    snap.forEach(doc => pints.push(doc.data().name));
+    const names = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Populate dropdowns
-    $("pricePintSelect").innerHTML =
-        pints.map(p => `<option>${p}</option>`).join("");
+    const selects = ["pricePintSelect", "findPintSelect"];
 
-    $("findPintSelect").innerHTML =
-        pints.map(p => `<option>${p}</option>`).join("");
-
-    return pints;
+    selects.forEach(sel => {
+        const el = $(sel);
+        el.innerHTML = "";
+        names.forEach(n => {
+            const opt = document.createElement("option");
+            opt.value = n.name;
+            opt.textContent = n.name;
+            el.appendChild(opt);
+        });
+    });
 }
 
-async function loadPrices() {
-    const snap = await getDocs(collection(db, "prices"));
-    const prices = [];
-    snap.forEach(doc => prices.push({ id: doc.id, ...doc.data() }));
-    return prices;
+async function loadPubs() {
+    const snap = await getDocs(collection(db, "pubs"));
+    const pubs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const pubSelect = $("pricePubSelect");
+    pubSelect.innerHTML = "";
+
+    pubs.forEach(pub => {
+        const opt = document.createElement("option");
+        opt.value = pub.id;
+        opt.textContent = `${pub.name} (${pub.area})`;
+        pubSelect.appendChild(opt);
+    });
 }
 
-
-// ------------------------------------------------------
-// ADD FUNCTIONS
-// ------------------------------------------------------
+/* -------------------------------------------
+   ADD FUNCTIONS
+------------------------------------------- */
 async function addPintName() {
     const name = $("newPintName").value.trim();
-    if (!name) return;
+    if (!name) return alert("Enter a pint name.");
 
     await addDoc(collection(db, "pintNames"), { name });
     $("newPintName").value = "";
-    refreshEverything();
+
+    await loadPintNames();
+    alert("Pint added.");
 }
 
 async function addPub() {
     const name = $("newPubName").value.trim();
     const area = $("newPubArea").value.trim();
-    if (!name || !area) return;
+    if (!name || !area) return alert("Enter pub name & area.");
 
     await addDoc(collection(db, "pubs"), { name, area });
     $("newPubName").value = "";
     $("newPubArea").value = "";
-    refreshEverything();
+
+    await loadPubs();
+    alert("Pub added.");
 }
 
 async function addPintPrice() {
@@ -93,7 +91,7 @@ async function addPintPrice() {
     const pintName = $("pricePintSelect").value;
     const price = parseFloat($("priceInput").value);
 
-    if (!pubId || !pintName || !price) return;
+    if (!pubId || !pintName || !price) return alert("Complete all fields.");
 
     await addDoc(collection(db, "prices"), {
         pubId,
@@ -103,128 +101,129 @@ async function addPintPrice() {
     });
 
     $("priceInput").value = "";
-    refreshEverything();
+    alert("Price added.");
+
+    await refreshEverything();
 }
 
+/* -------------------------------------------
+   CHEAPEST PINT RIGHT NOW
+------------------------------------------- */
+async function computeCheapestPint() {
+    const priceSnap = await getDocs(collection(db, "prices"));
+    const pubSnap = await getDocs(collection(db, "pubs"));
 
-// ------------------------------------------------------
-// CHEAPEST PINT OVERALL
-// ------------------------------------------------------
-async function calculateCheapestOverall(prices, pubs) {
-    if (!prices.length) return;
-
-    const cheapest = prices.reduce((a, b) => (a.price < b.price ? a : b));
-
-    const pub = pubs.find(p => p.id === cheapest.pubId)?.name || "Unknown pub";
-    $("cheapestPint").textContent =
-        `${cheapest.pintName} is £${cheapest.price.toFixed(2)} at ${pub}`;
-}
-
-
-// ------------------------------------------------------
-// FIND CHEAPEST BY PINT NAME
-// ------------------------------------------------------
-async function findCheapestPintType() {
-    const selected = $("findPintSelect").value;
-    const prices = await loadPrices();
-    const pubs = await loadPubs();
-
-    const filtered = prices.filter(p => p.pintName === selected);
-    if (!filtered.length) {
-        $("findPintOutput").textContent = "No data available.";
+    if (priceSnap.empty) {
+        $("cheapestPint").textContent = "No data yet.";
         return;
     }
 
-    const cheapest = filtered.reduce((a, b) => a.price < b.price ? a : b);
-    const pub = pubs.find(p => p.id === cheapest.pubId)?.name || "Unknown pub";
+    const pubs = Object.fromEntries(pubSnap.docs.map(d => [d.id, d.data()]));
+    const prices = priceSnap.docs.map(d => d.data());
 
-    $("findPintOutput").textContent =
-        `Cheapest ${selected} is £${cheapest.price.toFixed(2)} at ${pub}`;
+    const best = prices.reduce((a, b) => a.price < b.price ? a : b);
+
+    $("cheapestPint").textContent =
+        `${best.pintName} is £${best.price.toFixed(2)} at ${pubs[best.pubId].name}`;
 }
 
-
-// ------------------------------------------------------
-// PINTS PLANNER
-// ------------------------------------------------------
+/* -------------------------------------------
+   PINTS PLANNER (budget)
+------------------------------------------- */
 async function calculateBudget() {
     const budget = parseFloat($("budgetInput").value);
     if (!budget) return;
 
-    const prices = await loadPrices();
-    const pubs = await loadPubs();
+    const snap = await getDocs(collection(db, "prices"));
+    if (snap.empty) {
+        $("budgetOutput").textContent = "No price data available.";
+        return;
+    }
 
-    const cheapest = prices.reduce((a, b) => a.price < b.price ? a : b);
-    const pub = pubs.find(p => p.id === cheapest.pubId)?.name;
-
-    const count = Math.floor(budget / cheapest.price);
-    const leftover = (budget - count * cheapest.price).toFixed(2);
+    const allPrices = snap.docs.map(d => d.data());
+    const cheapest = allPrices.reduce((a, b) => a.price < b.price ? a : b);
+    const pintCount = Math.floor(budget / cheapest.price);
+    const remaining = (budget - pintCount * cheapest.price).toFixed(2);
 
     $("budgetOutput").textContent =
-        `You can get ${count}x ${cheapest.pintName} at ${pub}. You will have £${leftover} left.`;
+        `You can get ${pintCount}x ${cheapest.pintName}. £${remaining} left over.`;
 }
 
+/* -------------------------------------------
+   FIND CHEAPEST FOR SELECTED PINT
+------------------------------------------- */
+async function findCheapestPintType() {
+    const target = $("findPintSelect").value;
 
-// ------------------------------------------------------
-// PUB LEAGUE TABLE
-// ------------------------------------------------------
-async function renderLeague() {
-    const prices = await loadPrices();
-    const pubs = await loadPubs();
+    const priceSnap = await getDocs(collection(db, "prices"));
+    const pubSnap = await getDocs(collection(db, "pubs"));
 
-    // Compute average price per pub
-    const pubTotals = {};
-    prices.forEach(p => {
-        if (!pubTotals[p.pubId]) pubTotals[p.pubId] = [];
-        pubTotals[p.pubId].push(p.price);
-    });
+    const pubs = Object.fromEntries(pubSnap.docs.map(d => [d.id, d.data()]));
+    const candidates = priceSnap.docs
+        .map(d => d.data())
+        .filter(p => p.pintName === target);
 
-    const league = Object.entries(pubTotals).map(([pubId, arr]) => {
-        const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
-        return {
-            pub: pubs.find(p => p.id === pubId)?.name || "Unknown",
-            avg
-        };
-    });
+    if (candidates.length === 0) {
+        $("findPintOutput").textContent = "No prices recorded yet.";
+        return;
+    }
 
-    league.sort((a, b) => a.avg - b.avg);
+    const best = candidates.reduce((a, b) => a.price < b.price ? a : b);
+
+    $("findPintOutput").textContent =
+        `Cheapest ${target} is £${best.price.toFixed(2)} at ${pubs[best.pubId].name}.`;
+}
+
+/* -------------------------------------------
+   PUB LEAGUE TABLE
+------------------------------------------- */
+async function updateLeagueTable() {
+    const priceSnap = await getDocs(collection(db, "prices"));
+    const pubSnap = await getDocs(collection(db, "pubs"));
+
+    const pubs = Object.fromEntries(pubSnap.docs.map(d => [d.id, d.data()]));
+    const prices = priceSnap.docs.map(d => d.data());
+
+    if (prices.length === 0) {
+        $("topCheapest").textContent = "No data yet.";
+        $("topExpensive").textContent = "";
+        return;
+    }
+
+    const sorted = prices
+        .map(p => ({
+            ...p,
+            pubName: pubs[p.pubId]?.name || "Unknown Pub"
+        }))
+        .sort((a, b) => a.price - b.price);
+
+    const cheapest5 = sorted.slice(0, 5);
+    const expensive5 = sorted.slice(-5).reverse();
 
     $("topCheapest").innerHTML =
-        league.slice(0, 5).map(l => `${l.pub}: £${l.avg.toFixed(2)}`).join("<br>");
+        cheapest5.map(p => `£${p.price.toFixed(2)} - ${p.pintName} at ${p.pubName}`).join("<br>");
 
     $("topExpensive").innerHTML =
-        league.slice(-5).map(l => `${l.pub}: £${l.avg.toFixed(2)}`).join("<br>");
+        expensive5.map(p => `£${p.price.toFixed(2)} - ${p.pintName} at ${p.pubName}`).join("<br>");
 
     $("fullLeague").innerHTML =
-        league.map(l => `${l.pub}: £${l.avg.toFixed(2)}`).join("<br>");
+        sorted.map(p => `£${p.price.toFixed(2)} - ${p.pintName} at ${p.pubName}`).join("<br>");
 }
 
 window.toggleFullLeague = function () {
-    const div = $("fullLeague");
-    div.style.display = div.style.display === "none" ? "block" : "none";
+    const box = $("fullLeague");
+    box.style.display = box.style.display === "none" ? "block" : "none";
 };
 
-
-// ------------------------------------------------------
-// REFRESH EVERYTHING
-// ------------------------------------------------------
+/* -------------------------------------------
+   REFRESH EVERYTHING
+------------------------------------------- */
 async function refreshEverything() {
-    const pubs = await loadPubs();
-    const prices = await loadPrices();
-
-    loadPintNames();
-    calculateCheapestOverall(prices, pubs);
-    renderLeague();
+    await loadPintNames();
+    await loadPubs();
+    await computeCheapestPint();
+    await updateLeagueTable();
 }
 
-// Run on startup
 refreshEverything();
-
-
-// ------------------------------------------------------
-// EXPOSE FUNCTIONS TO WINDOW
-// ------------------------------------------------------
-window.addPintName = addPintName;
-window.addPub = addPub;
-window.addPintPrice = addPintPrice;
-window.calculateBudget = calculateBudget;
-window.findCheapestPintType = findCheapestPintType;
+console.log("Westminster Pint Index initialised.");
