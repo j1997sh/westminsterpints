@@ -1,104 +1,147 @@
-/* GLOBAL ----------------------------- */
-body {
+/* ------------------------------------------------------
+   GLOBAL LAYOUT + THEME
+------------------------------------------------------ */
+* {
     margin: 0;
     padding: 0;
-    background: #f3f6fb;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-    color: #222;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f2f4f7;
+    color: #1c1c1c;
+    padding: 20px;
+    line-height: 1.5;
+}
+
+/* ------------------------------------------------------
+   HEADER
+------------------------------------------------------ */
 header {
     text-align: center;
-    padding: 20px;
-    background: #ffffff;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #e3e3e3;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
 }
 
-h1 {
+header h1 {
+    font-size: 28px;
     margin-bottom: 5px;
-    font-size: 26px;
 }
 
-/* MAIN LAYOUT ------------------------ */
-main {
-    max-width: 700px;
-    margin: auto;
-    padding: 15px;
+header p {
+    color: #555;
+    font-size: 14px;
 }
 
-/* CARDS ------------------------------ */
+
+/* ------------------------------------------------------
+   CARDS
+------------------------------------------------------ */
 .card {
     background: #ffffff;
     padding: 18px;
-    border-radius: 12px;
     margin-bottom: 18px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .card h2 {
-    margin-top: 0;
-    margin-bottom: 12px;
     font-size: 20px;
+    margin-bottom: 12px;
 }
 
-/* INPUTS ------------------------------ */
+
+/* ------------------------------------------------------
+   INPUTS + SELECTS
+------------------------------------------------------ */
 input, select {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    background: #fff;
+    padding: 10px 12px;
+    margin-bottom: 12px;
     font-size: 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background: #fff;
 }
 
-input:focus, select:focus {
-    border-color: #0d52ff;
+input:focus,
+select:focus {
     outline: none;
+    border-color: #1d70b8;
+    box-shadow: 0 0 0 2px rgba(29,112,184,0.2);
 }
 
-/* BUTTONS ------------------------------ */
+
+/* ------------------------------------------------------
+   BUTTONS
+------------------------------------------------------ */
 button {
     width: 100%;
     padding: 12px;
-    background: #0d52ff;
-    border: none;
+    background: #1d70b8;
     color: #ffffff;
+    border: none;
     border-radius: 8px;
     font-size: 17px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: 550;
+    margin-top: 4px;
 }
 
 button:hover {
-    background: #063cca;
+    background: #155a92;
 }
 
-/* LEAGUE TABLE ------------------------- */
-#topCheapest, #topExpensive, #fullLeague {
-    padding: 10px;
-    background: #f7f9ff;
+button:active {
+    background: #0d4068;
+}
+
+
+/* ------------------------------------------------------
+   TEXT OUTPUT
+------------------------------------------------------ */
+p {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+#budgetOutput,
+#findPintOutput,
+#cheapestPint {
+    background: #eef4ff;
+    padding: 12px;
     border-radius: 8px;
-    margin-top: 8px;
-    line-height: 1.6;
 }
 
-/* MOBILE TWEAKS ------------------------ */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 22px;
-    }
 
-    button {
-        font-size: 16px;
-    }
+/* ------------------------------------------------------
+   PUB LEAGUE TABLE
+------------------------------------------------------ */
+#topCheapest,
+#topExpensive,
+#fullLeague {
+    margin-top: 8px;
+    font-size: 15px;
+}
 
-    input, select {
-        font-size: 15px;
-    }
+#fullLeague {
+    margin-top: 12px;
+}
 
-    .card {
-        padding: 15px;
+.card h3 {
+    margin-top: 12px;
+    font-size: 17px;
+    color: #1d70b8;
+}
+
+
+/* ------------------------------------------------------
+   MOBILE RESPONSIVE
+------------------------------------------------------ */
+@media (min-width: 700px) {
+    body {
+        max-width: 700px;
+        margin: 0 auto;
     }
 }
