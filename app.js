@@ -1,195 +1,333 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+// ==========================================
+// FIREBASE SETUP
+// ==========================================
 import {
-  getFirestore, collection, addDoc, getDocs, query, orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCxzyuAS...YOUR KEY...",
-  authDomain: "westminsterpints.firebaseapp.com",
-  projectId: "westminsterpints",
-  storageBucket: "westminsterpints.appspot.com",
-  messagingSenderId: "000000000",
-  appId: "1:000000000:web:000000000"
+    apiKey: "AIzaSyBHUGgt8F4OQJjdx11qOMPC0irjGFZmU8E",
+    authDomain: "westminsterpints.firebaseapp.com",
+    projectId: "westminsterpints",
+    storageBucket: "westminsterpints.appspot.com",
+    messagingSenderId: "913960848966",
+    appId: "1:913960848966:web:df6355a6b5b25dbdc5c447",
+    measurementId: "G-E9SNYKYEBN"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let pubs = [];
-let prices = [];
-let pintNames = [];
 
-// -----------------------------------------------------
-// LOAD DATA
-// -----------------------------------------------------
-async function loadAll() {
-  pubs = await loadCollection("pubs");
-  prices = await loadCollection("prices");
-  pintNames = await loadCollection("pintNames");
+// ==========================================
+// 1. ADD PINT NAME
+// ==========================================
+async function addPintName() {
+    const pintInput = document.getElementById("newPintName").value.trim();
 
-  refreshUI();
+    if (!pintInput) {
+        alert("Enter a name for the pint.");
+        return;
+    }
+
+    await addDoc(collection(db, "pintNames"), {
+        name: pintInput
+    });
+
+    alert("Pint added.");
+    document.getElementById("newPintName").value = "";
+    loadPintNames();
 }
 
-async function loadCollection(name) {
-  const snap = await getDocs(collection(db, name));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+// ==========================================
+// 2. ADD PUB NAME
+// ==========================================
+async function addPub() {
+    const name = document.getElementById("newPubName").value.trim();
+    const category = document.getElementById("newPubCategory").value;
+
+    if (!name) {
+        alert("Enter a pub name.");
+        return;
+    }
+
+    await addDoc(collection(db, "pubs"), {
+        name,
+        category
+    });
+
+    alert("Pub added.");
+    document.getElementById("newPubName").value = "";
+    loadPubs();
 }
 
-// -----------------------------------------------------
+
+// ==========================================
+// 3. ADD PINT PRICE
+// ==========================================
+async function addPintPrice() {
+    const pubId = document.getElementById("addPintPricePub").value;
+    const pintName = document.getElementById("addPintPriceName").value;
+    const price = parseFloat(document.getElementById("addPintPriceValue").value);
+
+    if (!pubId || !pintName || !price) {
+        alert("Fill all fields.");
+        return;
+    }
+
+    await addDoc(collection(db, "prices"), {
+        pintName,
+        pintType: "Lager",
+        price,
+        pubId,
+        timestamp: Date.now()
+    });
+
+    alert("Price added.");
+    document.getElementById("addPintPriceValue").value = "";
+
+    refreshEverything();
+}
+
+
+// ==========================================
+// LOAD OPTIONS
+// ==========================================
+async function loadPintNames() {
+    const snap = await getDocs(collection(db, "pintNames"));
+    const select = document.getElementById("addPintPriceName");
+    const finder = document.getElementById("pintTypeFinderSelect");
+
+    select.innerHTML = "";
+    finder.innerHTML = "";
+
+    snap.forEach(doc => {
+        const name = doc.data().name;
+        const option = `<option value="${name}">${name}</option>`;
+        select.innerHTML += option;
+        finder.innerHTML += option;
+    });
+}
+
+async function loadPubs() {
+    const snap = await getDocs(collection(db, "pubs"));
+    const select = document.getElementById("addPintPricePub");
+
+    select.innerHTML = "";
+
+    snap.forEach(doc => {
+        select.innerHTML += `<option value="${doc.id}">${doc.data().name}</option>`;
+    });
+}
+
+
+// ==========================================
+// 4. CHEAPEST PINT RIGHT NOW
+// ==========================================
+async function renderCheapestPint() {
+    const snap = await getDocs(collection(db, "prices"));
+    const pubs = await getDocs(collection(db, "pubs"));
+
+    const pubNames = {};
+    pubs.forEach(doc => pubNames[doc.id] = doc.data().name);
+
+    let cheapest = null;
+
+    snap.forEach(doc => {
+        const data = doc.data();
+        if (!cheapest || data.price < cheapest.price)
+            cheapest = data;
+    });
+
+    const box = document.getElementById("cheapestPintText");
+
+    if (!cheapest) {
+        box.textContent = "No prices available.";
+        return;
+    }
+
+    box.textContent = `${cheapest.pintName} is £${cheapest.price.toFixed(2)} at ${pubNames[cheapest.pubId]}`;
+}
+
+
+// ==========================================
+// 5. PINT TYPE FINDER (“Cheapest Peroni”)
+// ==========================================
+async function findCheapestPintType() {
+    const pintName = document.getElementById("pintTypeFinderSelect").value;
+    const snap = await getDocs(collection(db, "prices"));
+    const pubs = await getDocs(collection(db, "pubs"));
+
+    const pubLookup = {};
+    pubs.forEach(doc => pubLookup[doc.id] = doc.data().name);
+
+    let cheapest = null;
+
+    snap.forEach(doc => {
+        const data = doc.data();
+        if (data.pintName === pintName) {
+            if (!cheapest || data.price < cheapest.price)
+                cheapest = data;
+        }
+    });
+
+    const out = document.getElementById("pintTypeFinderResult");
+
+    if (!cheapest) {
+        out.textContent = "No prices found for that pint.";
+        return;
+    }
+
+    out.textContent = `Cheapest ${pintName} is £${cheapest.price.toFixed(2)} at ${pubLookup[cheapest.pubId]}`;
+}
+
+
+// ==========================================
+// 6. PINTS PLANNER (SMART UPGRADED VERSION)
+// ==========================================
+async function calculateBudgetHelper() {
+    const budget = parseFloat(document.getElementById("budgetInput").value);
+    const resultBox = document.getElementById("budgetResult");
+
+    if (!budget || budget <= 0) {
+        resultBox.textContent = "Enter a valid budget.";
+        return;
+    }
+
+    const pricesSnapshot = await getDocs(collection(db, "prices"));
+    const pubsSnapshot = await getDocs(collection(db, "pubs"));
+
+    const pubs = {};
+    pubsSnapshot.forEach(doc => pubs[doc.id] = doc.data().name);
+
+    let options = [];
+
+    pricesSnapshot.forEach(doc => {
+        const d = doc.data();
+        if (!d.price || !pubs[d.pubId]) return;
+
+        const pints = Math.floor(budget / d.price);
+
+        if (pints > 0) {
+            options.push({
+                pintName: d.pintName,
+                pubName: pubs[d.pubId],
+                price: d.price,
+                pints,
+                leftover: budget - pints * d.price
+            });
+        }
+    });
+
+    if (options.length === 0) {
+        resultBox.textContent = "You cannot afford any pint.";
+        return;
+    }
+
+    options.sort((a, b) => {
+        if (b.pints !== a.pints) return b.pints - a.pints;
+        return a.leftover - b.leftover;
+    });
+
+    const best = options[0];
+
+    let html = `
+        You can get <strong>${best.pints}× ${best.pintName}</strong>
+        at <strong>${best.pubName}</strong>.<br>
+        Money left over: <strong>£${best.leftover.toFixed(2)}</strong><br><br>
+        <strong>Other options:</strong><br>
+    `;
+
+    options.slice(1, 4).forEach(o => {
+        html += `• ${o.pints}× ${o.pintName} at ${o.pubName} (leftover £${o.leftover.toFixed(2)})<br>`;
+    });
+
+    resultBox.innerHTML = html;
+}
+
+
+// ==========================================
+// 7. PUB LEAGUE TABLE
+// ==========================================
+async function renderLeagueTable() {
+    const prices = await getDocs(collection(db, "prices"));
+    const pubs = await getDocs(collection(db, "pubs"));
+
+    const pubNames = {};
+    pubs.forEach(doc => pubNames[doc.id] = doc.data().name);
+
+    let map = {};
+
+    prices.forEach(doc => {
+        const d = doc.data();
+        if (!map[d.pubId]) map[d.pubId] = [];
+        map[d.pubId].push(d.price);
+    });
+
+    let entries = [];
+
+    Object.keys(map).forEach(pubId => {
+        const avg = map[pubId].reduce((a, b) => a + b) / map[pubId].length;
+        entries.push({ pubName: pubNames[pubId], avg });
+    });
+
+    entries.sort((a, b) => a.avg - b.avg);
+
+    const cheapestDiv = document.getElementById("leagueCheapest");
+    const expensiveDiv = document.getElementById("leagueExpensive");
+    const fullDiv = document.getElementById("fullLeague");
+
+    cheapestDiv.innerHTML = "";
+    expensiveDiv.innerHTML = "";
+    fullDiv.innerHTML = "";
+
+    entries.slice(0, 5).forEach(e => {
+        cheapestDiv.innerHTML += `<p>${e.pubName}: £${e.avg.toFixed(2)}</p>`;
+    });
+
+    entries.slice(-5).reverse().forEach(e => {
+        expensiveDiv.innerHTML += `<p>${e.pubName}: £${e.avg.toFixed(2)}</p>`;
+    });
+
+    entries.forEach(e => {
+        fullDiv.innerHTML += `<p>${e.pubName}: £${e.avg.toFixed(2)}</p>`;
+    });
+}
+
+function toggleLeague() {
+    const full = document.getElementById("fullLeague");
+    const btn = document.getElementById("showFullLeagueBtn");
+
+    if (full.style.display === "none") {
+        full.style.display = "block";
+        btn.textContent = "Hide Full League ▲";
+    } else {
+        full.style.display = "none";
+        btn.textContent = "Show Full League ▼";
+    }
+}
+
+
+// ==========================================
 // REFRESH EVERYTHING
-// -----------------------------------------------------
-function refreshUI() {
-  renderCheapestPint();
-  populateAddPintPrice();
-  populatePintFinder();
-  renderLeague();
+// ==========================================
+async function refreshEverything() {
+    await loadPintNames();
+    await loadPubs();
+    await renderCheapestPint();
+    await renderLeagueTable();
 }
 
-// -----------------------------------------------------
-// CHEAPEST PINT RIGHT NOW
-// -----------------------------------------------------
-function renderCheapestPint() {
-  if (prices.length === 0) {
-    document.getElementById("cheapestPintText").textContent =
-      "No prices yet.";
-    return;
-  }
+refreshEverything();
 
-  const cheapest = prices.reduce((a, b) => (a.price < b.price ? a : b));
-  const pub = pubs.find(p => p.id === cheapest.pubId);
-
-  document.getElementById("cheapestPintText").textContent =
-    `£${cheapest.price.toFixed(2)} (${cheapest.pintName}) at ${pub?.name || "Unknown"}`;
-}
-
-// -----------------------------------------------------
-// POPULATE SELECT OPTIONS
-// -----------------------------------------------------
-function populateAddPintPrice() {
-  const pubSelect = document.getElementById("addPintPricePub");
-  const nameSelect = document.getElementById("addPintPriceName");
-
-  pubSelect.innerHTML = pubs.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
-  nameSelect.innerHTML = pintNames.map(n => `<option>${n.name}</option>`).join("");
-}
-
-function populatePintFinder() {
-  const el = document.getElementById("pintTypeFinder");
-  el.innerHTML = pintNames.map(n => `<option>${n.name}</option>`).join("");
-}
-
-// -----------------------------------------------------
-// ADD FUNCTIONS
-// -----------------------------------------------------
-window.addPintPrice = async function () {
-  const pubId = document.getElementById("addPintPricePub").value;
-  const pintName = document.getElementById("addPintPriceName").value;
-  const price = Number(document.getElementById("addPintPriceValue").value);
-
-  if (!price) return alert("Enter a valid price");
-
-  await addDoc(collection(db, "prices"), {
-    pintName,
-    pintType: "Lager",
-    price,
-    pubId,
-    timestamp: Date.now()
-  });
-
-  await loadAll();
-};
-
-window.addPintName = async function () {
-  const name = document.getElementById("newPintName").value.trim();
-  if (!name) return;
-  await addDoc(collection(db, "pintNames"), { name });
-  await loadAll();
-};
-
-window.addPub = async function () {
-  const name = document.getElementById("newPubName").value.trim();
-  if (!name) return;
-  await addDoc(collection(db, "pubs"), { name, category: "Westminster" });
-  await loadAll();
-};
-
-// -----------------------------------------------------
-// PINT TYPE FINDER
-// -----------------------------------------------------
-window.findCheapestPintType = function () {
-  const type = document.getElementById("pintTypeFinder").value;
-  const matches = prices.filter(p => p.pintName === type);
-  if (matches.length === 0) {
-    document.getElementById("pintTypeFinderResult").textContent =
-      `No prices for ${type}`;
-    return;
-  }
-
-  const cheapest = matches.reduce((a, b) => (a.price < b.price ? a : b));
-  const pub = pubs.find(p => p.id === cheapest.pubId);
-
-  document.getElementById("pintTypeFinderResult").textContent =
-    `Cheapest ${type} is £${cheapest.price} at ${pub?.name}`;
-};
-
-// -----------------------------------------------------
-// BUDGET HELPER
-// -----------------------------------------------------
-window.calculateBudgetHelper = function () {
-  const budget = Number(document.getElementById("budgetInput").value);
-  if (!budget) return;
-
-  if (prices.length === 0) {
-    document.getElementById("budgetResult").textContent = "No data yet.";
-    return;
-  }
-
-  const cheapest = prices.reduce((a, b) => (a.price < b.price ? a : b));
-  const count = Math.floor(budget / cheapest.price);
-  const pub = pubs.find(p => p.id === cheapest.pubId);
-
-  document.getElementById("budgetResult").textContent =
-    `You can get ${count}x ${cheapest.pintName} at ${pub?.name}.`;
-};
-
-// -----------------------------------------------------
-// LEAGUE TABLE
-// -----------------------------------------------------
-function renderLeague() {
-  if (prices.length === 0) return;
-
-  const avgByPub = pubs.map(pub => {
-    const pints = prices.filter(pr => pr.pubId === pub.id);
-    const avg = pints.length ? pints.reduce((a, b) => a + b.price, 0) / pints.length : null;
-    return { pub, avg };
-  }).filter(x => x.avg !== null);
-
-  const cheapest = [...avgByPub].sort((a, b) => a.avg - b.avg).slice(0, 5);
-  const expensive = [...avgByPub].sort((a, b) => b.avg - a.avg).slice(0, 5);
-  const full = [...avgByPub].sort((a, b) => a.avg - b.avg);
-
-  document.getElementById("leagueCheapest").innerHTML =
-    cheapest.map(x => `<p>${x.pub.name}: £${x.avg.toFixed(2)}</p>`).join("");
-
-  document.getElementById("leagueExpensive").innerHTML =
-    expensive.map(x => `<p>${x.pub.name}: £${x.avg.toFixed(2)}</p>`).join("");
-
-  document.getElementById("fullLeague").innerHTML =
-    full.map(x => `<p>${x.pub.name}: £${x.avg.toFixed(2)}</p>`).join("");
-}
-
-window.toggleLeague = function () {
-  const full = document.getElementById("fullLeague");
-  const btn = document.getElementById("showFullLeagueBtn");
-
-  if (full.style.display === "none") {
-    full.style.display = "block";
-    btn.textContent = "Hide League ▲";
-  } else {
-    full.style.display = "none";
-    btn.textContent = "Show Full League ▼";
-  }
-};
-
-// -----------------------------------------------------
-loadAll();
+console.log("Westminster Pint Index initialised.");
