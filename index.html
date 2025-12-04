@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Westminster Pint Index</title>
-    <link rel="stylesheet" href="styles.css?v=1.0.0">
+    <link rel="stylesheet" href="styles.css?v=1.0.1">
 </head>
+
 <body>
 
 <header>
     <h1>🍺 Westminster Pint Index</h1>
-    <p>Real-time pint prices across Westminster.</p>
+    <p>Real-time pint prices across Westminster</p>
 </header>
 
 <main>
@@ -18,6 +19,7 @@
 <!-- ADD PINT PRICE -->
 <section class="card">
     <h2>🍺 Add Pint Price</h2>
+
     <select id="pricePubSelect"></select>
     <select id="pricePintSelect"></select>
     <input id="priceInput" type="number" placeholder="Price (£)">
@@ -27,19 +29,21 @@
 <!-- ADD PINT NAME -->
 <section class="card">
     <h2>📝 Add Pint Name</h2>
-    <input id="newPintName" placeholder="New pint (e.g. Peroni)">
+
+    <input id="newPintName" placeholder="Pint name (e.g. Peroni)">
     <button onclick="addPintName()">Add Pint</button>
 </section>
 
 <!-- ADD PUB -->
 <section class="card">
-    <h2>➕ Add Pub</h2>
+    <h2>🏛 Add Pub</h2>
+
     <input id="newPubName" placeholder="Pub name">
     <input id="newPubArea" placeholder="Area (e.g. Westminster)">
-    <button onclick="addPub()">Add Pub 🏛</button>
+    <button onclick="addPub()">Add Pub</button>
 </section>
 
-<!-- CHEAPEST PINT -->
+<!-- CHEAPEST PINT RIGHT NOW -->
 <section class="card">
     <h2>🏆 Cheapest Pint Right Now</h2>
     <p id="cheapestPint">Loading...</p>
@@ -48,14 +52,16 @@
 <!-- PINTS PLANNER -->
 <section class="card">
     <h2>🍻 Pints Planner</h2>
+
     <input id="budgetInput" type="number" placeholder="Your budget (£)">
     <button onclick="calculateBudget()">Calculate</button>
     <p id="budgetOutput"></p>
 </section>
 
-<!-- FIND CHEAPEST BY PINT -->
+<!-- FIND CHEAPEST FOR A SPECIFIC PINT -->
 <section class="card">
     <h2>🔎 I want to get the cheapest…</h2>
+
     <select id="findPintSelect"></select>
     <button onclick="findCheapestPintType()">Find Cheapest</button>
     <p id="findPintOutput"></p>
@@ -77,6 +83,7 @@
 
 </main>
 
-<script type="module" src="app.js?v=1.0.0"></script>
+<script type="module" src="app.js?v=1.0.1"></script>
+
 </body>
 </html>
