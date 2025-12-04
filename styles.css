@@ -1,3 +1,4 @@
+/* GLOBAL ----------------------------- */
 body {
     margin: 0;
     padding: 0;
@@ -11,7 +12,7 @@ header {
     padding: 20px;
     background: #ffffff;
     margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e3e3e3;
 }
 
 h1 {
@@ -19,14 +20,16 @@ h1 {
     font-size: 26px;
 }
 
+/* MAIN LAYOUT ------------------------ */
 main {
     max-width: 700px;
     margin: auto;
     padding: 15px;
 }
 
+/* CARDS ------------------------------ */
 .card {
-    background: #fff;
+    background: #ffffff;
     padding: 18px;
     border-radius: 12px;
     margin-bottom: 18px;
@@ -39,26 +42,63 @@ main {
     font-size: 20px;
 }
 
+/* INPUTS ------------------------------ */
 input, select {
     width: 100%;
     padding: 12px;
     margin-bottom: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
+    background: #fff;
     font-size: 16px;
 }
 
+input:focus, select:focus {
+    border-color: #0d52ff;
+    outline: none;
+}
+
+/* BUTTONS ------------------------------ */
 button {
     width: 100%;
     padding: 12px;
     background: #0d52ff;
     border: none;
-    color: white;
+    color: #ffffff;
     border-radius: 8px;
     font-size: 17px;
     cursor: pointer;
+    font-weight: 550;
 }
 
 button:hover {
     background: #063cca;
+}
+
+/* LEAGUE TABLE ------------------------- */
+#topCheapest, #topExpensive, #fullLeague {
+    padding: 10px;
+    background: #f7f9ff;
+    border-radius: 8px;
+    margin-top: 8px;
+    line-height: 1.6;
+}
+
+/* MOBILE TWEAKS ------------------------ */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    button {
+        font-size: 16px;
+    }
+
+    input, select {
+        font-size: 15px;
+    }
+
+    .card {
+        padding: 15px;
+    }
 }
