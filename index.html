@@ -1,49 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Westminster Pints Exchange</title>
-<link rel="stylesheet" href="styles.css?v=2">
-</head>
-
 <body>
 
 <header class="top-header">
-  <h1>🍺 Westminster Pints Index</h1>
+  <h1>🍺 Westminster Pint Index</h1>
   <p class="subtitle">Real-time pint prices across Westminster</p>
 </header>
 
-<!-- CHEAPEST PINT -->
-<section class="card" id="cheapestPintCard">
+
+<!-- =========================
+     ADD PINT PRICE
+========================= -->
+<section class="card">
+  <h2>🍺 Add Pint Price</h2>
+
+  <select id="addPintPricePub"></select>
+
+  <select id="addPintPriceName"></select>
+
+  <input id="addPintPriceValue" type="number" placeholder="Price (£)">
+
+  <button onclick="addPintPrice()">Add Price 💷</button>
+</section>
+
+
+<!-- =========================
+     ADD PINT NAME
+========================= -->
+<section class="card">
+  <h2>📝 Add Pint Name</h2>
+  <input id="newPintName" placeholder="Pint name (e.g. Peroni)">
+  <button onclick="addPintName()">Add Pint</button>
+</section>
+
+
+<!-- =========================
+     ADD PUB
+========================= -->
+<section class="card">
+  <h2>➕ Add Pub</h2>
+  <input id="newPubName" placeholder="Pub name">
+  <select id="newPubCategory">
+    <option value="Westminster">Westminster</option>
+  </select>
+  <button onclick="addPub()">Add Pub 🏛️</button>
+</section>
+
+
+<!-- =========================
+     CHEAPEST PINT RIGHT NOW
+========================= -->
+<section class="card">
   <h2>🏆 Cheapest Pint Right Now</h2>
   <p id="cheapestPintText">Loading...</p>
 </section>
 
-<!-- ADD PINT PRICE -->
-<section class="card">
-  <h2>🍺 Add Pint Price</h2>
-  <select id="addPintPricePub"></select>
-  <select id="addPintPriceName"></select>
-  <input id="addPintPriceValue" type="number" placeholder="Price (£)">
-  <button onclick="addPintPrice()">Add Price 💷</button>
-</section>
 
-<!-- ADD PINT NAME -->
-<section class="card">
-  <h2>📝 Add Pint Name</h2>
-  <input id="newPintName" placeholder="Pint Name (e.g. Peroni)">
-  <button onclick="addPintName()">Add Pint</button>
-</section>
-
-<!-- ADD PUB -->
-<section class="card">
-  <h2>➕ Add Pub</h2>
-  <input id="newPubName" placeholder="Pub Name">
-  <button onclick="addPub()">Add Pub 🏛️</button>
-</section>
-
-<!-- BUDGET HELPER -->
+<!-- =========================
+     PINTS PLANNER
+========================= -->
 <section class="card">
   <h2>🍺 Pints Planner</h2>
   <input id="budgetInput" type="number" placeholder="Your budget (£)">
@@ -51,15 +64,24 @@
   <p id="budgetResult"></p>
 </section>
 
-<!-- PINT TYPE FINDER -->
+
+<!-- =========================
+     PINT TYPE FINDER
+========================= -->
 <section class="card">
-  <h2>🔍 I want to get the cheapest…</h2>
-  <select id="pintTypeFinder"></select>
+  <h2>🔍 I want to get the cheapest...</h2>
+
+  <select id="pintTypeFinderSelect"></select>
+
   <button onclick="findCheapestPintType()">Find Cheapest</button>
+
   <p id="pintTypeFinderResult"></p>
 </section>
 
-<!-- PUB LEAGUE TABLE -->
+
+<!-- =========================
+     PUB LEAGUE TABLE
+========================= -->
 <section class="card">
   <h2>📊 Pub League Table</h2>
 
@@ -74,13 +96,18 @@
   <div id="fullLeague" style="display:none"></div>
 </section>
 
-<!-- MOBILE NAV -->
+
+
+<!-- =========================
+     MOBILE NAV
+========================= -->
 <nav class="bottom-nav">
-  <button onclick="scrollToTop()">🏠</button>
-  <button onclick="scrollToAddPint()">➕</button>
-  <button onclick="scrollToLeague()">📊</button>
+  <button onclick="window.scrollTo(0,0)">🏠</button>
+  <button onclick="document.querySelector('#addPintPricePub').scrollIntoView()">➕</button>
+  <button onclick="document.querySelector('#budgetInput').scrollIntoView()">📊</button>
+  <button onclick="document.querySelector('#pintTypeFinderSelect').scrollIntoView()">🔍</button>
 </nav>
+
 
 <script type="module" src="app.js?v=2"></script>
 </body>
-</html>
