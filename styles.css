@@ -1,193 +1,64 @@
-/* ===========================
-   GLOBAL RESET + BASE STYLES
-   =========================== */
-* {
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    background: #f3f6fb;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    color: #222;
 }
 
-html, body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f3f5fa;
-    color: #1c1c1c;
-    overflow-x: hidden;
-    padding-bottom: 80px; /* Space for bottom nav */
-}
-
-/* ===========================
-   HEADER
-   =========================== */
-.top-header {
-    background: linear-gradient(135deg, #0047b3, #0066ff);
-    color: white;
+header {
     text-align: center;
-    padding: 25px 10px;
+    padding: 20px;
+    background: #ffffff;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
 }
 
-.top-header h1 {
-    font-size: 1.7rem;
-    font-weight: 700;
+h1 {
+    margin-bottom: 5px;
+    font-size: 26px;
 }
 
-.subtitle {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-top: 5px;
+main {
+    max-width: 700px;
+    margin: auto;
+    padding: 15px;
 }
 
-/* ===========================
-   CARD LAYOUT
-   =========================== */
 .card {
-    background: white;
-    margin: 15px;
+    background: #fff;
     padding: 18px;
-    border-radius: 14px;
-    box-shadow: 0 2px 7px rgba(0,0,0,0.06);
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .card h2 {
-    font-size: 1.2rem;
+    margin-top: 0;
     margin-bottom: 12px;
-    font-weight: 600;
+    font-size: 20px;
 }
 
-/* Subtitles inside cards */
-.card h3 {
-    margin-top: 12px;
-    font-size: 1rem;
-    color: #555;
-}
-
-/* ===========================
-   INPUTS + SELECTS + BUTTONS
-   =========================== */
-input,
-select {
+input, select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #d1d4db;
-    border-radius: 10px;
-    margin-top: 10px;
-    font-size: 1rem;
-    background: #fdfdfd;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
 }
 
 button {
     width: 100%;
-    margin-top: 12px;
     padding: 12px;
+    background: #0d52ff;
     border: none;
-    border-radius: 10px;
-    background: #005ce6;
     color: white;
-    font-size: 1rem;
-    font-weight: 600;
+    border-radius: 8px;
+    font-size: 17px;
     cursor: pointer;
 }
 
 button:hover {
-    background: #004ecc;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-/* ===========================
-   TEXT OUTPUTS
-   =========================== */
-#cheapestPintText,
-#budgetResult,
-#pintTypeFinderResult {
-    margin-top: 10px;
-    background: #f0f3fa;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 1rem;
-}
-
-/* ===========================
-   LEAGUE TABLE
-   =========================== */
-#leagueCheapest p,
-#leagueExpensive p,
-#fullLeague p {
-    background: #f8faff;
-    margin: 6px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border-left: 5px solid #0073ff;
-    font-size: 0.95rem;
-}
-
-#leagueExpensive p {
-    border-left-color: #ff5757;
-}
-
-#fullLeague {
-    margin-top: 15px;
-}
-
-/* ===========================
-   SHOW/HIDE BUTTON
-   =========================== */
-#showFullLeagueBtn {
-    background: #ddd;
-    color: #333;
-    margin-top: 15px;
-}
-
-#showFullLeagueBtn:hover {
-    background: #ccc;
-}
-
-/* ===========================
-   BOTTOM NAVIGATION (MOBILE)
-   =========================== */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 65px;
-    background: white;
-    border-top: 1px solid #d5d7dd;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-    z-index: 999;
-}
-
-.bottom-nav button {
-    background: none;
-    border: none;
-    font-size: 1.6rem;
-    color: #005ce6;
-    width: auto;
-    padding: 0;
-}
-
-.bottom-nav button:active {
-    transform: scale(0.9);
-}
-
-/* ===========================
-   DESKTOP OPTIMISATION
-   =========================== */
-@media (min-width: 900px) {
-    body {
-        padding-bottom: 0;
-    }
-
-    .card {
-        max-width: 700px;
-        margin: 20px auto;
-    }
-
-    .bottom-nav {
-        display: none; /* Desktop doesn't need it */
-    }
+    background: #063cca;
 }
